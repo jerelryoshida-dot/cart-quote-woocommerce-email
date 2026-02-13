@@ -1,0 +1,473 @@
+/**
+ * Admin Styles for Cart Quote WooCommerce & Email
+ *
+ * @package CartQuoteWooCommerce
+ * @author Jerel Yoshida
+ * @since 1.0.0
+ */
+
+/* Dashboard Header */
+.cart-quote-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.cart-quote-dashboard-header h1 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cart-quote-dashboard-header .page-title-action {
+    margin-left: 10px;
+}
+
+/* Statistics Cards */
+.cart-quote-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.cart-quote-stat-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.cart-quote-stat-card .stat-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: #0073aa;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.cart-quote-stat-card .stat-label {
+    color: #666;
+    font-size: 14px;
+}
+
+.cart-quote-stat-card.stat-pending .stat-number {
+    color: #ffb900;
+}
+
+.cart-quote-stat-card.stat-contacted .stat-number {
+    color: #46b450;
+}
+
+.cart-quote-stat-card.stat-closed .stat-number {
+    color: #0073aa;
+}
+
+.cart-quote-stat-card.stat-canceled .stat-number {
+    color: #dc3232;
+}
+
+/* Quotes Table */
+.cart-quote-list-table {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cart-quote-list-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart-quote-list-table th,
+.cart-quote-list-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-quote-list-table th {
+    background: #f9f9f9;
+    font-weight: 600;
+}
+
+.cart-quote-list-table tr:hover {
+    background: #f5f5f5;
+}
+
+.cart-quote-list-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Status Badges */
+.cart-quote-status {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.cart-quote-status.status-pending {
+    background: #fff8e5;
+    color: #b45900;
+}
+
+.cart-quote-status.status-contacted {
+    background: #ecf7ed;
+    color: #2e7d32;
+}
+
+.cart-quote-status.status-closed {
+    background: #e5f3ff;
+    color: #0073aa;
+}
+
+.cart-quote-status.status-canceled {
+    background: #fce4e4;
+    color: #c62828;
+}
+
+/* Quote Actions */
+.cart-quote-row-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.cart-quote-row-actions .button {
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+/* Quote Detail Page */
+.cart-quote-detail {
+    max-width: 1200px;
+}
+
+.cart-quote-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ccd0d4;
+}
+
+.cart-quote-detail-header h2 {
+    margin: 0 0 5px;
+}
+
+.cart-quote-meta {
+    color: #666;
+    font-size: 14px;
+}
+
+.cart-quote-detail-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.cart-quote-detail-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cart-quote-detail-card h3 {
+    margin: 0;
+    padding: 15px 20px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #ccd0d4;
+    font-size: 14px;
+}
+
+.cart-quote-detail-card .card-content {
+    padding: 20px;
+}
+
+/* Cart Items Table */
+.cart-quote-items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart-quote-items-table th,
+.cart-quote-items-table td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-quote-items-table th {
+    text-align: left;
+    font-weight: 600;
+    background: #f9f9f9;
+}
+
+/* Customer Info */
+.cart-quote-customer-info dt {
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+.cart-quote-customer-info dt:first-child {
+    margin-top: 0;
+}
+
+.cart-quote-customer-info dd {
+    margin: 5px 0 0;
+    color: #666;
+}
+
+/* Admin Notes */
+.cart-quote-admin-notes textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.cart-quote-admin-notes .button {
+    margin-top: 10px;
+}
+
+/* Activity Log */
+.cart-quote-activity-log {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.cart-quote-activity-log li {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.cart-quote-activity-log li:last-child {
+    border-bottom: none;
+}
+
+.cart-quote-activity-log .log-time {
+    color: #999;
+    display: block;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+/* Google Calendar Section */
+.cart-quote-google-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.cart-quote-google-status .status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.cart-quote-google-status .status-indicator.connected {
+    background: #46b450;
+}
+
+.cart-quote-google-status .status-indicator.disconnected {
+    background: #dc3232;
+}
+
+.cart-quote-google-connect {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    max-width: 500px;
+    margin: 30px auto;
+}
+
+.cart-quote-google-connect h3 {
+    margin-top: 0;
+}
+
+/* Settings Page */
+.cart-quote-settings-form {
+    max-width: 800px;
+}
+
+.cart-quote-settings-section {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.cart-quote-settings-section h3 {
+    margin: 0;
+    padding: 15px 20px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #ccd0d4;
+}
+
+.cart-quote-settings-section .inside {
+    padding: 20px;
+}
+
+.cart-quote-settings-section table.form-table {
+    margin: 0;
+}
+
+.cart-quote-settings-section table.form-table th {
+    padding: 15px 10px 15px 0;
+}
+
+.cart-quote-settings-section table.form-table td {
+    padding: 15px 10px;
+}
+
+/* Time Slots */
+.cart-quote-time-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.cart-quote-time-slot {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #f5f5f5;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+.cart-quote-time-slot input {
+    width: 80px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.cart-quote-time-slot .remove-slot {
+    color: #dc3232;
+    cursor: pointer;
+}
+
+/* Modal */
+.cart-quote-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+}
+
+.cart-quote-modal-content {
+    background: #fff;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.cart-quote-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ccd0d4;
+}
+
+.cart-quote-modal-header h3 {
+    margin: 0;
+}
+
+.cart-quote-modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+}
+
+.cart-quote-modal-body {
+    padding: 20px;
+}
+
+.cart-quote-modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #ccd0d4;
+    text-align: right;
+}
+
+/* Toast Notifications */
+.cart-quote-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #333;
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 5px;
+    z-index: 100001;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.3s ease;
+}
+
+.cart-quote-toast.success {
+    background: #46b450;
+}
+
+.cart-quote-toast.error {
+    background: #dc3232;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .cart-quote-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 782px) {
+    .cart-quote-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cart-quote-dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}

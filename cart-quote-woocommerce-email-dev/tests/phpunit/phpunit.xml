@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+    bootstrap="bootstrap.php"
+    colors="true"
+    verbose="true"
+    testdox="true"
+    cacheResultFile=".phpunit.cache/test-results"
+    failOnRisky="true"
+    failOnWarning="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory suffix="_Test.php">./Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory suffix="_Test.php">./Integration</directory>
+        </testsuite>
+        <testsuite name="Security">
+            <directory suffix="_Test.php">./Unit/Security</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage>
+        <include>
+            <directory suffix=".php">../../plugin/src</directory>
+        </include>
+        <report>
+            <html outputDirectory="coverage/html"/>
+        </report>
+    </coverage>
+
+    <php>
+        <const name="WP_TESTS_SKIP_INSTALL" value="1"/>
+        <const name="WP_DEBUG" value="true"/>
+    </php>
+</phpunit>

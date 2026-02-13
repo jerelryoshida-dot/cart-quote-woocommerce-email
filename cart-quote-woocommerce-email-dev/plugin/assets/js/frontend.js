@@ -1,0 +1,302 @@
+/**
+ * Frontend JavaScript for Cart Quote WooCommerce & Email
+ *
+ * @package CartQuoteWooCommerce
+ * @author Jerel Yoshida
+ * @since 1.0.4
+ */
+
+(function($) {
+    'use strict';
+
+    /**
+     * Update cart item quantity via AJAX (single request)
+     */
+    function updateCartItemQuantity(cartItemKey, quantity, $row) {
+        if (!cartItemKey) {
+            console.log('Cart Quote: Missing cart item key');
+            return;
+        }
+
+        if (typeof cartQuoteFrontend === 'undefined') {
+            console.log('Cart Quote: cartQuoteFrontend not defined');
+            return;
+        }
+
+        var $wrapper = $row.closest('.cart-quote-form-wrapper');
+        
+        $.ajax({
+            url: cartQuoteFrontend.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'cart_quote_update_cart',
+                nonce: cartQuoteFrontend.nonce,
+                cart_item_key: cartItemKey,
+                quantity: quantity
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Update UI directly from response (no second AJAX call)
+                    if (response.data.items) {
+                        response.data.items.forEach(function(item) {
+                            var $itemRow = $wrapper.find('li[data-cart-item-key="' + item.key + '"]');
+                            if ($itemRow.length) {
+                                $itemRow.find('.item-price').html(item.line_total);
+                                var $input = $itemRow.find('.cart-quote-qty-input');
+                                if ($input.length) {
+                                    $input.val(item.quantity);
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Update subtotal
+                    if (response.data.subtotal) {
+                        $wrapper.find('.cart-quote-subtotal-amount').html(response.data.subtotal);
+                    }
+                } else {
+                    console.log('Cart Quote Error:', response.data.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Cart Quote AJAX Error:', error);
+            }
+        });
+    }
+
+    // Document ready
+    $(document).ready(function() {
+        
+        // Handle + button click for Quote Form
+        $(document).on('click', '.cart-quote-summary-items .cart-quote-qty-plus', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var $btn = $(this);
+            var $row = $btn.closest('li');
+            var $input = $row.find('.cart-quote-qty-input');
+            
+            var cartItemKey = $row.attr('data-cart-item-key');
+            
+            var currentVal = parseInt($input.val()) || 1;
+            var newVal = currentVal + 1;
+            
+            $input.val(newVal);
+            updateCartItemQuantity(cartItemKey, newVal, $row);
+        });
+        
+        // Handle - button click for Quote Form
+        $(document).on('click', '.cart-quote-summary-items .cart-quote-qty-minus', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var $btn = $(this);
+            var $row = $btn.closest('li');
+            var $input = $row.find('.cart-quote-qty-input');
+            
+            var cartItemKey = $row.attr('data-cart-item-key');
+            
+            var currentVal = parseInt($input.val()) || 1;
+            var newVal = currentVal - 1;
+            
+            if (newVal < 1) {
+                newVal = 1;
+            }
+            
+            $input.val(newVal);
+            
+            if (newVal !== currentVal) {
+                updateCartItemQuantity(cartItemKey, newVal, $row);
+            }
+        });
+        
+        // Handle manual input change for Quote Form
+        $(document).on('change', '.cart-quote-summary-items .cart-quote-qty-input', function(e) {
+            var $input = $(this);
+            var $row = $input.closest('li');
+            var cartItemKey = $row.attr('data-cart-item-key');
+            var quantity = parseInt($input.val()) || 1;
+            
+            if (quantity < 1) {
+                quantity = 1;
+                $input.val(1);
+            }
+            
+            updateCartItemQuantity(cartItemKey, quantity, $row);
+        });
+
+        // Handle table quantity controls (Cart Widget)
+        $(document).on('click', '.cart-quote-table .cart-quote-qty-plus', function(e) {
+            e.preventDefault();
+            var $input = $(this).siblings('.cart-quote-qty-input');
+            var currentVal = parseInt($input.val()) || 1;
+            $input.val(currentVal + 1).trigger('change');
+        });
+
+        $(document).on('click', '.cart-quote-table .cart-quote-qty-minus', function(e) {
+            e.preventDefault();
+            var $input = $(this).siblings('.cart-quote-qty-input');
+            var currentVal = parseInt($input.val()) || 1;
+            if (currentVal > 1) {
+                $input.val(currentVal - 1).trigger('change');
+            }
+        });
+
+        $(document).on('change', '.cart-quote-table .cart-quote-qty-input', function(e) {
+            var $row = $(this).closest('tr');
+            var cartItemKey = $row.attr('data-cart-item-key');
+            var quantity = parseInt($(this).val()) || 0;
+
+            if (typeof cartQuoteFrontend !== 'undefined' && cartItemKey) {
+                $.ajax({
+                    url: cartQuoteFrontend.ajaxUrl,
+                    type: 'POST',
+                    data: {
+                        action: 'cart_quote_update_cart',
+                        nonce: cartQuoteFrontend.nonce,
+                        cart_item_key: cartItemKey,
+                        quantity: quantity
+                    },
+                    success: function(response) {
+                        if (response.success && response.data.subtotal) {
+                            $('.cart-quote-subtotal-value').html(response.data.subtotal);
+                        }
+                    }
+                });
+            }
+        });
+
+        // Remove item button
+        $(document).on('click', '.cart-quote-remove-btn', function(e) {
+            e.preventDefault();
+            
+            var $btn = $(this);
+            var $row = $btn.closest('tr, li');
+            var cartItemKey = $btn.attr('data-cart-item-key');
+            var productName = $btn.attr('data-product-name') || 'this item';
+            var $wrapper = $row.closest('.cart-quote-form-wrapper');
+
+            if (typeof cartQuoteFrontend === 'undefined' || !cartItemKey) {
+                return;
+            }
+
+            // Show confirmation dialog
+            var confirmMessage = 'Are you sure you want to remove "' + productName + '" from your cart?';
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            // Animate out immediately for better UX
+            $row.css('opacity', '0.5');
+
+            $.ajax({
+                url: cartQuoteFrontend.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'cart_quote_remove_item',
+                    nonce: cartQuoteFrontend.nonce,
+                    cart_item_key: cartItemKey
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $row.fadeOut(200, function() {
+                            $(this).remove();
+                            
+                            // Update subtotal if in quote form
+                            if ($wrapper.length && response.data.subtotal) {
+                                $wrapper.find('.cart-quote-subtotal-amount').html(response.data.subtotal);
+                            }
+                            
+                            // Update cart widget subtotal
+                            if (response.data.subtotal) {
+                                $('.cart-quote-subtotal-value').html(response.data.subtotal);
+                            }
+                            
+                            // Reload if cart is empty
+                            if (response.data.cart_count === 0) {
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        // Restore opacity on error
+                        $row.css('opacity', '1');
+                    }
+                },
+                error: function() {
+                    $row.css('opacity', '1');
+                }
+            });
+        });
+
+        // Quote form submission
+        $(document).on('submit', '#cart-quote-form', function(e) {
+            e.preventDefault();
+
+            var $form = $(this);
+            var $wrapper = $form.closest('.cart-quote-form-wrapper');
+            var $submitBtn = $form.find('.cart-quote-submit-btn');
+            var originalText = $submitBtn.text();
+
+            // Validate required fields
+            var isValid = true;
+            $form.find('[required]').each(function() {
+                if (!$(this).val()) {
+                    $(this).addClass('error');
+                    isValid = false;
+                } else {
+                    $(this).removeClass('error');
+                }
+            });
+
+            if (!isValid) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            // Disable button
+            $submitBtn.prop('disabled', true).text('Processing...');
+
+            if (typeof cartQuoteFrontend !== 'undefined') {
+                $.ajax({
+                    url: cartQuoteFrontend.ajaxUrl,
+                    type: 'POST',
+                    data: $form.serialize() + '&action=cart_quote_submit&nonce=' + cartQuoteFrontend.nonce,
+                    success: function(response) {
+                        if (response.success) {
+                            $form.hide();
+                            var successMessage = $wrapper.data('success-message') || 'Thank you! Your quote request has been submitted.';
+                            $wrapper.find('.cart-quote-form-success p').text(successMessage);
+                            $wrapper.find('.cart-quote-form-success').show();
+
+                            if (response.data.redirect_url) {
+                                setTimeout(function() {
+                                    window.location.href = response.data.redirect_url;
+                                }, 2000);
+                            }
+                        } else {
+                            alert(response.data.message || 'An error occurred.');
+                            $submitBtn.prop('disabled', false).text(originalText);
+                        }
+                    },
+                    error: function() {
+                        alert('An error occurred. Please try again.');
+                        $submitBtn.prop('disabled', false).text(originalText);
+                    }
+                });
+            }
+        });
+
+        // Contract duration toggle
+        $(document).on('change', '#contract_duration', function() {
+            var $customField = $('.cart-quote-custom-duration');
+            if ($(this).val() === 'custom') {
+                $customField.slideDown();
+            } else {
+                $customField.slideUp();
+                $customField.find('input').val('');
+            }
+        });
+
+    });
+
+})(jQuery);

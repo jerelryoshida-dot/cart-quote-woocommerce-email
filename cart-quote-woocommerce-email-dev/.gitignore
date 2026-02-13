@@ -1,0 +1,43 @@
+# Composer
+vendor/
+composer.lock
+
+# PHPUnit (in tests/phpunit/)
+tests/phpunit/vendor/
+tests/phpunit/.phpunit.cache/
+tests/phpunit/coverage/
+.phpunit.result.cache
+
+# Node.js / Cypress (in tests/cypress/)
+tests/cypress/node_modules/
+tests/cypress/cypress/videos/
+tests/cypress/cypress/screenshots/
+tests/cypress/cypress/downloads/
+
+# Security scan results (in tests/security/)
+tests/security/sqlmap/sqlmap-results/
+tests/security/zap/zap-reports/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# WordPress
+*.log
+wp-config.php
+
+# Build artifacts
+dist/
+build/
+*.zip
+
+# Temporary files
+*.tmp
+*.temp

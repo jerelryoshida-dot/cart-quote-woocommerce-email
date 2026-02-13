@@ -1,0 +1,74 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  zap-scan:
+    name: OWASP ZAP Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.7.0
+        with:
+          target: 'http://localhost'
+          rules_file_name: 'tests/security/zap/scan-config.conf'
+          allow_issue_writing: false
+          fail_action: false
+        continue-on-error: true
+
+  dependency-check:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: 'plugin/'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+  php-security:
+    name: PHP Security Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+      
+      - name: Install dependencies
+        run: |
+          cd plugin
+          composer install --no-dev --no-interaction || true
+      
+      - name: Check for PHP vulnerabilities
+        run: |
+          echo "Checking PHP files for potential security issues..."
+          grep -r "eval(" plugin/src/ --include="*.php" && echo "WARNING: eval() found" || echo "OK: No eval() found"
+          grep -r "exec(" plugin/src/ --include="*.php" && echo "WARNING: exec() found" || echo "OK: No exec() found"
+          grep -r "system(" plugin/src/ --include="*.php" && echo "WARNING: system() found" || echo "OK: No system() found"
+          grep -r "passthru(" plugin/src/ --include="*.php" && echo "WARNING: passthru() found" || echo "OK: No passthru() found"
+          grep -r "shell_exec(" plugin/src/ --include="*.php" && echo "WARNING: shell_exec() found" || echo "OK: No shell_exec() found"
+          echo "Security check complete."

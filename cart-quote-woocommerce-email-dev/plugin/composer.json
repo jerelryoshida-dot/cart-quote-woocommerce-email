@@ -1,0 +1,28 @@
+{
+    "name": "jerelryoshida-dot/cart-quote-woocommerce-email",
+    "description": "Transform WooCommerce checkout into a quote submission system with Google Calendar integration",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Jerel Yoshida",
+            "email": "jerel@users.noreply.github.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "CartQuoteWooCommerce\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.4",
+        "ext-json": "*",
+        "ext-curl": "*"
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "prefer-stable": true,
+    "minimum-stability": "stable"
+}

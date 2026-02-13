@@ -1,0 +1,32 @@
+{
+  "name": "cart-quote-woocommerce-cypress-tests",
+  "version": "1.0.0",
+  "description": "E2E tests for Cart Quote WooCommerce & Email plugin",
+  "private": true,
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "cypress:run:headed": "cypress run --headed",
+    "cypress:run:chrome": "cypress run --browser chrome",
+    "cypress:run:firefox": "cypress run --browser firefox",
+    "test": "cypress run",
+    "test:security": "cypress run --spec 'cypress/e2e/security-tests.cy.js'"
+  },
+  "devDependencies": {
+    "cypress": "^13.6.0",
+    "@cypress/grep": "^4.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "wordpress",
+    "woocommerce",
+    "cypress",
+    "e2e",
+    "testing",
+    "security"
+  ],
+  "author": "Jerel Yoshida",
+  "license": "GPL-2.0-or-later"
+}
