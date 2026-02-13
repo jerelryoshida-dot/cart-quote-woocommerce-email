@@ -1,0 +1,20 @@
+# Exclude everything except cart-quote-woocommerce-email directory
+!cart-quote-woocommerce-email
+!cart-quote-woocommerce-email/.gitignore
+!cart-quote-woocommerce-email/README.md
+!cart-quote-woocommerce-email/composer.json
+!cart-quote-woocommerce-email/composer.lock
+!cart-quote-woocommerce-email/readme.txt
+!README.md
+
+# Exclude all other files and directories
+.gitignore
+composer.json
+composer.lock
+readme.txt
+tests/
+tools/
+.env
+nul
+*.log
+.DS_Store
