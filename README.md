@@ -243,37 +243,6 @@ cart-quote-woocommerce-email/
         └── quote-form.php
 ```
 
-### Database Schema
-
-```sql
-CREATE TABLE wp_cart_quote_submissions (
-    id                BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    quote_id          VARCHAR(20) NOT NULL,
-    customer_name     VARCHAR(255) NOT NULL,
-    email             VARCHAR(255) NOT NULL,
-    phone             VARCHAR(50) DEFAULT NULL,
-    company_name      VARCHAR(255) DEFAULT NULL,
-    preferred_date    DATE DEFAULT NULL,
-    preferred_time    VARCHAR(20) DEFAULT NULL,
-    contract_duration VARCHAR(100) DEFAULT NULL,
-    meeting_requested TINYINT(1) DEFAULT 0,
-    cart_data         LONGTEXT NOT NULL,
-    subtotal          DECIMAL(10,2) DEFAULT 0.00,
-    status            VARCHAR(20) DEFAULT 'pending',
-    admin_notes       TEXT DEFAULT NULL,
-    additional_notes  TEXT DEFAULT NULL,
-    google_event_id   VARCHAR(255) DEFAULT NULL,
-    calendar_synced   TINYINT(1) DEFAULT 0,
-    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY quote_id (quote_id),
-    KEY email (email),
-    KEY status (status),
-    KEY created_at (created_at)
-);
-```
-
 ---
 
 ## Releases
