@@ -1,0 +1,114 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to release from'
+        required: true
+        default: 'master'
+        type: choice
+        options:
+          - master
+          - dev
+      create_tag:
+        description: 'Create and push git tag'
+        required: true
+        default: 'true'
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Version
+        id: version
+        run: |
+          VERSION=$(grep "Version:" cart-quote-woocommerce-email.php | awk '{print $3}')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create Plugin Zip
+        run: |
+          powershell -Command "Compress-Archive -Path '*' -DestinationPath 'cart-quote-woocommerce-email-${{ steps.version.outputs.version }}.zip' -Force"
+
+      - name: Generate Release Notes
+        id: notes
+        run: |
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          echo "## Release v${{ steps.version.outputs.version }}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "See [Update-Log](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/wiki/Update-Log) for detailed changes." >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Update AGENTS.md Update Log
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          ENTRY="| ${{ steps.version.outputs.version }} | $DATE | **Automated Release** |"
+          
+          sed -i "3a\\$ENTRY" AGENTS.md
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "actions@github.com"
+          git add AGENTS.md
+          git commit -m "docs: Add v${{ steps.version.outputs.version }} to Update Log (automated)"
+          git push origin ${{ inputs.branch }}
+
+      - name: Create Git Tag
+        if: inputs.create_tag == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "actions@github.com"
+          git tag -a "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+
+      - name: Update Wiki
+        env:
+          WIKI_TOKEN: ${{ secrets.WIKI_UPDATE_TOKEN }}
+        run: |
+          if [ -z "$WIKI_TOKEN" ]; then
+            echo "WIKI_UPDATE_TOKEN secret not set. Skipping wiki update."
+            echo "To enable wiki updates, add WIKI_UPDATE_TOKEN to repository secrets."
+            exit 0
+          fi
+          
+          echo "Cloning wiki repository..."
+          git clone https://$WIKI_TOKEN@github.com/jerelryoshida-dot/cart-quote-woocommerce-email.wiki.git wiki
+          
+          echo "Updating Update-Log.md..."
+          DATE=$(date +%Y-%m-%d)
+          ENTRY="| [v${{ steps.version.outputs.version }}](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v${{ steps.version.outputs.version }}) | $DATE | **Automated Release** |"
+          
+          sed -i "3a\\$ENTRY" wiki/Update-Log.md
+          
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "actions@github.com"
+          git add Update-Log.md
+          git commit -m "docs: Add v${{ steps.version.outputs.version }} to Update Log (automated)"
+          git push origin master
+          
+          cd ..
+          rm -rf wiki
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          body: ${{ steps.notes.outputs.content }}
+          files: cart-quote-woocommerce-email-${{ steps.version.outputs.version }}.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f cart-quote-woocommerce-email-*.zip
