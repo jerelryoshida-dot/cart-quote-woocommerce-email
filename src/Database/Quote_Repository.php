@@ -95,13 +95,14 @@ class Quote_Repository
                 'preferred_time' => sanitize_text_field($data['preferred_time'] ?? ''),
                 'contract_duration' => sanitize_text_field($data['contract_duration'] ?? ''),
                 'meeting_requested' => (int) ($data['meeting_requested'] ?? 0),
+                'additional_notes' => sanitize_textarea_field($data['additional_notes'] ?? ''),
                 'cart_data' => wp_json_encode($data['cart_data']),
                 'subtotal' => (float) ($data['subtotal'] ?? 0),
                 'status' => 'pending',
                 'created_at' => current_time('mysql'),
                 'updated_at' => current_time('mysql'),
             ],
-            ['%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%s', '%s', '%s']
+            ['%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%f', '%s', '%s', '%s']
         );
 
         if ($result === false) {
@@ -148,6 +149,7 @@ class Quote_Repository
                     $format[] = '%d';
                     break;
                 case 'admin_notes':
+                case 'additional_notes':
                     $update_data[$key] = sanitize_textarea_field($value);
                     $format[] = '%s';
                     break;

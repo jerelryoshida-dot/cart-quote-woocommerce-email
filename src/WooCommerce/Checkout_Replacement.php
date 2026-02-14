@@ -366,6 +366,7 @@ class Checkout_Replacement
             'preferred_time' => isset($form_data['preferred_time']) ? $form_data['preferred_time'] : '',
             'contract_duration' => isset($form_data['contract_duration_final']) ? $form_data['contract_duration_final'] : '',
             'meeting_requested' => !empty($form_data['meeting_requested']) ? 1 : 0,
+            'additional_notes' => isset($form_data['additional_notes']) ? $form_data['additional_notes'] : '',
             'cart_data' => $cart_data,
             'subtotal' => WC()->cart->get_subtotal(),
         ];
@@ -382,9 +383,6 @@ class Checkout_Replacement
 
         // Trigger action for extensibility
         do_action('cart_quote_after_submission', $insert_id, $quote_id, $insert_data);
-
-        // Clear cart
-        WC()->cart->empty_cart();
 
         // Return success with redirect
         $redirect_url = add_query_arg([

@@ -129,16 +129,3 @@ if (!defined('ABSPATH')) {
         </div>
     </form>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const durationSelect = document.getElementById('contract_duration');
-    const customField = document.querySelector('.cart-quote-custom-duration');
-    
-    if (durationSelect && customField) {
-        durationSelect.addEventListener('change', function() {
-            customField.style.display = this.value === 'custom' ? 'block' : 'none';
-        });
-    }
-});
-</script>

@@ -59,6 +59,7 @@ class Activator
             subtotal decimal(10,2) DEFAULT 0.00,
             status varchar(20) DEFAULT 'pending',
             admin_notes text DEFAULT NULL,
+            additional_notes text DEFAULT NULL,
             google_event_id varchar(255) DEFAULT NULL,
             calendar_synced tinyint(1) DEFAULT 0,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
