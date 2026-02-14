@@ -92,23 +92,6 @@ Use these shortcodes if you don't have Elementor:
 [cart_quote_mini_cart show_count="true" show_subtotal="true"]
 ```
 
-### Quote Form Fields
-
-The quote form collects:
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| First Name | Yes | Customer first name |
-| Last Name | Yes | Customer last name |
-| Email | Yes | Customer email address |
-| Phone | Yes | Customer phone number |
-| Company | Yes | Company/organization name |
-| Preferred Date | Yes | Preferred start/meeting date |
-| Preferred Time | No | Preferred meeting time slot |
-| Contract Duration | Yes | 1 month, 3 months, 6 months, or custom |
-| Meeting Request | No | Checkbox to request a meeting |
-| Additional Notes | No | Any extra information |
-
 ### Admin Features
 
 - **Quote List** - View all quotes with filtering by status, date range, search
