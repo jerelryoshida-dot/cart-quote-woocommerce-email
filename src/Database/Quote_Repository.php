@@ -14,41 +14,25 @@ declare(strict_types=1);
 
 namespace CartQuoteWooCommerce\Database;
 
-/**
- * Class Quote_Repository
- */
+use CartQuoteWooCommerce\Core\Debug_Logger;
+
 class Quote_Repository
 {
-    /**
-     * WordPress database instance
-     *
-     * @var \wpdb
-     */
     private \wpdb $wpdb;
 
-    /**
-     * Table name
-     *
-     * @var string
-     */
     private string $table_name;
 
-    /**
-     * Logs table name
-     *
-     * @var string
-     */
     private string $logs_table;
 
-    /**
-     * Constructor
-     */
+    private Debug_Logger $logger;
+
     public function __construct()
     {
         global $wpdb;
         $this->wpdb = $wpdb;
         $this->table_name = $wpdb->prefix . CART_QUOTE_WC_TABLE_SUBMISSIONS;
         $this->logs_table = $wpdb->prefix . 'cart_quote_logs';
+        $this->logger = Debug_Logger::get_instance();
     }
 
     /**
@@ -83,38 +67,50 @@ class Quote_Repository
      */
     public function insert(array $data)
     {
-        $result = $this->wpdb->insert(
-            $this->table_name,
-            [
-                'quote_id' => $data['quote_id'],
-                'customer_name' => sanitize_text_field($data['customer_name']),
-                'email' => sanitize_email($data['email']),
-                'phone' => sanitize_text_field($data['phone'] ?? ''),
-                'company_name' => sanitize_text_field($data['company_name'] ?? ''),
-                'preferred_date' => sanitize_text_field($data['preferred_date'] ?? ''),
-                'preferred_time' => sanitize_text_field($data['preferred_time'] ?? ''),
-                'contract_duration' => sanitize_text_field($data['contract_duration'] ?? ''),
-                'meeting_requested' => (int) ($data['meeting_requested'] ?? 0),
-                'additional_notes' => sanitize_textarea_field($data['additional_notes'] ?? ''),
-                'cart_data' => wp_json_encode($data['cart_data']),
-                'subtotal' => (float) ($data['subtotal'] ?? 0),
-                'status' => 'pending',
-                'created_at' => current_time('mysql'),
-                'updated_at' => current_time('mysql'),
-            ],
-            ['%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%f', '%s', '%s', '%s']
-        );
+        try {
+            $result = $this->wpdb->insert(
+                $this->table_name,
+                [
+                    'quote_id' => $data['quote_id'],
+                    'customer_name' => sanitize_text_field($data['customer_name']),
+                    'email' => sanitize_email($data['email']),
+                    'phone' => sanitize_text_field($data['phone'] ?? ''),
+                    'company_name' => sanitize_text_field($data['company_name'] ?? ''),
+                    'preferred_date' => sanitize_text_field($data['preferred_date'] ?? ''),
+                    'preferred_time' => sanitize_text_field($data['preferred_time'] ?? ''),
+                    'contract_duration' => sanitize_text_field($data['contract_duration'] ?? ''),
+                    'meeting_requested' => (int) ($data['meeting_requested'] ?? 0),
+                    'additional_notes' => sanitize_textarea_field($data['additional_notes'] ?? ''),
+                    'cart_data' => wp_json_encode($data['cart_data']),
+                    'subtotal' => (float) ($data['subtotal'] ?? 0),
+                    'status' => 'pending',
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql'),
+                ],
+                ['%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%f', '%s', '%s', '%s']
+            );
 
-        if ($result === false) {
+            if ($result === false) {
+                $this->logger->error('Database insert failed', [
+                    'table' => $this->table_name,
+                    'error' => $this->wpdb->last_error,
+                ]);
+                return false;
+            }
+
+            $insert_id = (int) $this->wpdb->insert_id;
+
+            $this->log($data['quote_id'], 'created', 'Quote submitted by customer');
+
+            return $insert_id;
+        } catch (\Exception $e) {
+            $this->logger->error('Exception during quote insert', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data,
+            ]);
             return false;
         }
-
-        $insert_id = (int) $this->wpdb->insert_id;
-        
-        // Log the creation
-        $this->log($data['quote_id'], 'created', 'Quote submitted by customer');
-
-        return $insert_id;
     }
 
     /**
@@ -126,52 +122,70 @@ class Quote_Repository
      */
     public function update(int $id, array $data): bool
     {
-        $format = [];
-        $update_data = [];
+        try {
+            $format = [];
+            $update_data = [];
 
-        foreach ($data as $key => $value) {
-            switch ($key) {
-                case 'customer_name':
-                case 'email':
-                case 'phone':
-                case 'company_name':
-                case 'preferred_date':
-                case 'preferred_time':
-                case 'contract_duration':
-                case 'status':
-                case 'google_event_id':
-                    $update_data[$key] = sanitize_text_field($value);
-                    $format[] = '%s';
-                    break;
-                case 'meeting_requested':
-                case 'calendar_synced':
-                    $update_data[$key] = (int) $value;
-                    $format[] = '%d';
-                    break;
-                case 'admin_notes':
-                case 'additional_notes':
-                    $update_data[$key] = sanitize_textarea_field($value);
-                    $format[] = '%s';
-                    break;
-                case 'subtotal':
-                    $update_data[$key] = (float) $value;
-                    $format[] = '%f';
-                    break;
+            foreach ($data as $key => $value) {
+                switch ($key) {
+                    case 'customer_name':
+                    case 'email':
+                    case 'phone':
+                    case 'company_name':
+                    case 'preferred_date':
+                    case 'preferred_time':
+                    case 'contract_duration':
+                    case 'status':
+                    case 'google_event_id':
+                        $update_data[$key] = sanitize_text_field($value);
+                        $format[] = '%s';
+                        break;
+                    case 'meeting_requested':
+                    case 'calendar_synced':
+                        $update_data[$key] = (int) $value;
+                        $format[] = '%d';
+                        break;
+                    case 'admin_notes':
+                    case 'additional_notes':
+                        $update_data[$key] = sanitize_textarea_field($value);
+                        $format[] = '%s';
+                        break;
+                    case 'subtotal':
+                        $update_data[$key] = (float) $value;
+                        $format[] = '%f';
+                        break;
+                }
             }
+
+            $update_data['updated_at'] = current_time('mysql');
+            $format[] = '%s';
+
+            $result = $this->wpdb->update(
+                $this->table_name,
+                $update_data,
+                ['id' => $id],
+                $format,
+                ['%d']
+            );
+
+            if ($result === false) {
+                $this->logger->warning('Database update failed', [
+                    'table' => $this->table_name,
+                    'id' => $id,
+                    'error' => $this->wpdb->last_error,
+                ]);
+            }
+
+            return $result !== false;
+        } catch (\Exception $e) {
+            $this->logger->error('Exception during quote update', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'id' => $id,
+                'data' => $data,
+            ]);
+            return false;
         }
-
-        $update_data['updated_at'] = current_time('mysql');
-        $format[] = '%s';
-
-        $result = $this->wpdb->update(
-            $this->table_name,
-            $update_data,
-            ['id' => $id],
-            $format,
-            ['%d']
-        );
-
-        return $result !== false;
     }
 
     /**
@@ -182,18 +196,32 @@ class Quote_Repository
      */
     public function find(int $id): ?object
     {
-        $quote = $this->wpdb->get_row(
-            $this->wpdb->prepare(
-                "SELECT * FROM {$this->table_name} WHERE id = %d",
-                $id
-            )
-        );
+        try {
+            $quote = $this->wpdb->get_row(
+                $this->wpdb->prepare(
+                    "SELECT * FROM {$this->table_name} WHERE id = %d",
+                    $id
+                )
+            );
 
-        if ($quote) {
-            $quote->cart_data = json_decode($quote->cart_data, true);
+            if ($quote) {
+                $quote->cart_data = json_decode($quote->cart_data, true);
+            } else {
+                $this->logger->warning('Quote not found', [
+                    'table' => $this->table_name,
+                    'id' => $id,
+                ]);
+            }
+
+            return $quote;
+        } catch (\Exception $e) {
+            $this->logger->error('Exception during quote find', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'id' => $id,
+            ]);
+            return null;
         }
-
-        return $quote;
     }
 
     /**

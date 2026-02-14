@@ -15,25 +15,18 @@ declare(strict_types=1);
 namespace CartQuoteWooCommerce\Admin;
 
 use CartQuoteWooCommerce\Database\Quote_Repository;
+use CartQuoteWooCommerce\Core\Debug_Logger;
 
-/**
- * Class Admin_Manager
- */
 class Admin_Manager
 {
-    /**
-     * Quote repository
-     *
-     * @var Quote_Repository
-     */
     private Quote_Repository $repository;
 
-    /**
-     * Constructor
-     */
+    private Debug_Logger $logger;
+
     public function __construct()
     {
         $this->repository = new Quote_Repository();
+        $this->logger = Debug_Logger::get_instance();
     }
 
     /**
@@ -322,36 +315,57 @@ class Admin_Manager
      */
     public function handle_update_status(): void
     {
-        $id = (int) ($_POST['id'] ?? 0);
-        $status = sanitize_text_field($_POST['status'] ?? '');
+        try {
+            $id = (int) ($_POST['id'] ?? 0);
+            $status = sanitize_text_field($_POST['status'] ?? '');
 
-        if (!$id || !$status) {
-            wp_send_json_error(['message' => __('Invalid parameters.', 'cart-quote-woocommerce-email')]);
-        }
-
-        $valid_statuses = ['pending', 'contacted', 'closed', 'canceled'];
-        if (!in_array($status, $valid_statuses, true)) {
-            wp_send_json_error(['message' => __('Invalid status.', 'cart-quote-woocommerce-email')]);
-        }
-
-        $result = $this->repository->update_status($id, $status);
-
-        if ($result) {
-            // If status is contacted and meeting was requested, potentially create event
-            if ($status === 'contacted' && get_option('cart_quote_wc_auto_create_event')) {
-                $quote = $this->repository->find($id);
-                if ($quote && $quote->meeting_requested && !$quote->calendar_synced) {
-                    // Trigger event creation
-                    do_action('cart_quote_auto_create_event', $quote);
-                }
+            if (!$id || !$status) {
+                wp_send_json_error(['message' => __('Invalid parameters.', 'cart-quote-woocommerce-email')]);
             }
 
-            wp_send_json_success([
-                'message' => __('Status updated successfully.', 'cart-quote-woocommerce-email'),
-                'new_status' => $status,
+            $valid_statuses = ['pending', 'contacted', 'closed', 'canceled'];
+            if (!in_array($status, $valid_statuses, true)) {
+                $this->logger->warning('Invalid status update requested', [
+                    'id' => $id,
+                    'status' => $status,
+                ]);
+                wp_send_json_error(['message' => __('Invalid status.', 'cart-quote-woocommerce-email')]);
+            }
+
+            $result = $this->repository->update_status($id, $status);
+
+            if ($result) {
+                $quote = $this->repository->find($id);
+
+                // If status is contacted and meeting was requested, potentially create event
+                if ($status === 'contacted' && get_option('cart_quote_wc_auto_create_event')) {
+                    if ($quote && $quote->meeting_requested && !$quote->calendar_synced) {
+                        do_action('cart_quote_auto_create_event', $quote);
+                    }
+                }
+
+                $this->logger->info('Status updated', [
+                    'quote_id' => $quote->quote_id ?? $id,
+                    'status' => $status,
+                ]);
+
+                wp_send_json_success([
+                    'message' => __('Status updated successfully.', 'cart-quote-woocommerce-email'),
+                    'new_status' => $status,
+                ]);
+            } else {
+                $this->logger->error('Failed to update status', [
+                    'id' => $id,
+                    'status' => $status,
+                ]);
+                wp_send_json_error(['message' => __('Failed to update status.', 'cart-quote-woocommerce-email')]);
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('Exception in handle_update_status', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
-        } else {
-            wp_send_json_error(['message' => __('Failed to update status.', 'cart-quote-woocommerce-email')]);
+            wp_send_json_error(['message' => __('An error occurred.', 'cart-quote-woocommerce-email')]);
         }
     }
 
@@ -362,19 +376,32 @@ class Admin_Manager
      */
     public function handle_save_notes(): void
     {
-        $id = (int) ($_POST['id'] ?? 0);
-        $notes = sanitize_textarea_field($_POST['notes'] ?? '');
+        try {
+            $id = (int) ($_POST['id'] ?? 0);
+            $notes = sanitize_textarea_field($_POST['notes'] ?? '');
 
-        if (!$id) {
-            wp_send_json_error(['message' => __('Invalid quote ID.', 'cart-quote-woocommerce-email')]);
-        }
+            if (!$id) {
+                wp_send_json_error(['message' => __('Invalid quote ID.', 'cart-quote-woocommerce-email')]);
+            }
 
-        $result = $this->repository->update($id, ['admin_notes' => $notes]);
+            $result = $this->repository->update($id, ['admin_notes' => $notes]);
 
-        if ($result) {
-            wp_send_json_success(['message' => __('Notes saved.', 'cart-quote-woocommerce-email')]);
-        } else {
-            wp_send_json_error(['message' => __('Failed to save notes.', 'cart-quote-woocommerce-email')]);
+            if ($result) {
+                $this->logger->info('Admin notes saved', [
+                    'quote_id' => $id,
+                    'notes_length' => strlen($notes),
+                ]);
+                wp_send_json_success(['message' => __('Notes saved.', 'cart-quote-woocommerce-email')]);
+            } else {
+                $this->logger->error('Failed to save notes', ['id' => $id]);
+                wp_send_json_error(['message' => __('Failed to save notes.', 'cart-quote-woocommerce-email')]);
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('Exception in handle_save_notes', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            wp_send_json_error(['message' => __('An error occurred.', 'cart-quote-woocommerce-email')]);
         }
     }
 
@@ -385,25 +412,38 @@ class Admin_Manager
      */
     public function handle_export_csv(): void
     {
-        $status = sanitize_text_field($_GET['status'] ?? '');
-        $date_from = sanitize_text_field($_GET['date_from'] ?? '');
-        $date_to = sanitize_text_field($_GET['date_to'] ?? '');
+        try {
+            $status = sanitize_text_field($_GET['status'] ?? '');
+            $date_from = sanitize_text_field($_GET['date_from'] ?? '');
+            $date_to = sanitize_text_field($_GET['date_to'] ?? '');
 
-        $csv = $this->repository->export_csv([
-            'status' => $status,
-            'date_from' => $date_from,
-            'date_to' => $date_to,
-        ]);
+            $csv = $this->repository->export_csv([
+                'status' => $status,
+                'date_from' => $date_from,
+                'date_to' => $date_to,
+            ]);
 
-        $filename = 'quotes-' . date('Y-m-d-His') . '.csv';
+            if ($csv === false) {
+                $this->logger->error('CSV export failed: repository error');
+                wp_send_json_error(['message' => __('Failed to generate CSV.', 'cart-quote-woocommerce-email')]);
+            }
 
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename=' . $filename);
-        header('Pragma: no-cache');
-        header('Expires: 0');
+            $filename = 'quotes-' . date('Y-m-d-His') . '.csv';
 
-        echo $csv;
-        exit;
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename=' . $filename);
+            header('Pragma: no-cache');
+            header('Expires: 0');
+
+            echo $csv;
+            exit;
+        } catch (\Exception $e) {
+            $this->logger->error('Exception in handle_export_csv', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            wp_send_json_error(['message' => __('An error occurred.', 'cart-quote-woocommerce-email')]);
+        }
     }
 
     /**

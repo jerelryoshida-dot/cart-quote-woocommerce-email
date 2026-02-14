@@ -9,24 +9,18 @@
 
 namespace CartQuoteWooCommerce\Emails;
 
-/**
- * Class Email_Service
- */
+use CartQuoteWooCommerce\Core\Debug_Logger;
+
 class Email_Service
 {
-    /**
-     * Quote repository
-     *
-     * @var Quote_Repository
-     */
     private $repository;
 
-    /**
-     * Constructor
-     */
+    private $logger;
+
     public function __construct()
     {
         $this->repository = new \CartQuoteWooCommerce\Database\Quote_Repository();
+        $this->logger = Debug_Logger::get_instance();
     }
 
     /**
@@ -78,6 +72,15 @@ class Email_Service
 
         if ($sent) {
             $this->repository->log($quote->quote_id, 'admin_email_sent', 'Admin notification email sent');
+            $this->logger->info('Admin email sent', [
+                'quote_id' => $quote->quote_id,
+                'to' => $to,
+            ]);
+        } else {
+            $this->logger->error('Failed to send admin email', [
+                'quote_id' => $quote->quote_id ?? 'unknown',
+                'to' => $to,
+            ]);
         }
 
         return $sent;
@@ -100,6 +103,15 @@ class Email_Service
 
         if ($sent) {
             $this->repository->log($quote->quote_id, 'client_email_sent', 'Client confirmation email sent');
+            $this->logger->info('Client email sent', [
+                'quote_id' => $quote->quote_id,
+                'to' => $to,
+            ]);
+        } else {
+            $this->logger->error('Failed to send client email', [
+                'quote_id' => $quote->quote_id ?? 'unknown',
+                'to' => $to,
+            ]);
         }
 
         return $sent;

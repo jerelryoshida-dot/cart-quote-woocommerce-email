@@ -12,16 +12,17 @@
 
 namespace CartQuoteWooCommerce\Frontend;
 
-/**
- * Class Frontend_Manager
- */
+use CartQuoteWooCommerce\Core\Debug_Logger;
+
 class Frontend_Manager
 {
-    /**
-     * Initialize frontend functionality
-     *
-     * @return void
-     */
+    private $logger;
+
+    public function __construct()
+    {
+        $this->logger = Debug_Logger::get_instance();
+    }
+
     public function init()
     {
         // Add shortcode for quote form
@@ -138,57 +139,66 @@ class Frontend_Manager
      */
     public function handle_cart_update()
     {
-        $cart_item_key = sanitize_text_field($_POST['cart_item_key'] ?? '');
-        $quantity = (int) ($_POST['quantity'] ?? 0);
+        try {
+            $cart_item_key = sanitize_text_field($_POST['cart_item_key'] ?? '');
+            $quantity = (int) ($_POST['quantity'] ?? 0);
 
-        if (empty($cart_item_key)) {
-            wp_send_json_error(['message' => __('Invalid cart item key.', 'cart-quote-woocommerce-email')]);
-        }
-
-        if ($quantity < 0) {
-            wp_send_json_error(['message' => __('Invalid quantity.', 'cart-quote-woocommerce-email')]);
-        }
-
-        // Make sure WooCommerce cart is available
-        if (!function_exists('WC') || !WC()->cart) {
-            wp_send_json_error(['message' => __('Cart not available.', 'cart-quote-woocommerce-email')]);
-        }
-
-        if ($quantity === 0) {
-            // Remove item
-            $removed = WC()->cart->remove_cart_item($cart_item_key);
-            if (!$removed) {
-                wp_send_json_error(['message' => __('Could not remove item.', 'cart-quote-woocommerce-email')]);
+            if (empty($cart_item_key)) {
+                wp_send_json_error(['message' => __('Invalid cart item key.', 'cart-quote-woocommerce-email')]);
             }
-        } else {
-            // Update quantity
-            $updated = WC()->cart->set_quantity($cart_item_key, $quantity, true);
-            if (!$updated) {
-                wp_send_json_error(['message' => __('Could not update quantity.', 'cart-quote-woocommerce-email')]);
+
+            if ($quantity < 0) {
+                wp_send_json_error(['message' => __('Invalid quantity.', 'cart-quote-woocommerce-email')]);
             }
+
+            if (!function_exists('WC') || !WC()->cart) {
+                $this->logger->error('Cart update failed: WooCommerce cart not available');
+                wp_send_json_error(['message' => __('Cart not available.', 'cart-quote-woocommerce-email')]);
+            }
+
+            if ($quantity === 0) {
+                $removed = WC()->cart->remove_cart_item($cart_item_key);
+                if (!$removed) {
+                    $this->logger->warning('Failed to remove cart item', ['cart_item_key' => $cart_item_key]);
+                    wp_send_json_error(['message' => __('Could not remove item.', 'cart-quote-woocommerce-email')]);
+                }
+            } else {
+                $updated = WC()->cart->set_quantity($cart_item_key, $quantity, true);
+                if (!$updated) {
+                    $this->logger->warning('Failed to update cart quantity', [
+                        'cart_item_key' => $cart_item_key,
+                        'quantity' => $quantity,
+                    ]);
+                    wp_send_json_error(['message' => __('Could not update quantity.', 'cart-quote-woocommerce-email')]);
+                }
+            }
+
+            WC()->cart->calculate_totals();
+
+            $cart_items = [];
+            foreach (WC()->cart->get_cart() as $item_key => $cart_item) {
+                $product = $cart_item['data'];
+                $cart_items[] = [
+                    'key' => $item_key,
+                    'quantity' => $cart_item['quantity'],
+                    'line_total' => wc_price($cart_item['line_total']),
+                ];
+            }
+
+            wp_send_json_success([
+                'message' => __('Cart updated.', 'cart-quote-woocommerce-email'),
+                'cart_count' => WC()->cart->get_cart_contents_count(),
+                'subtotal' => WC()->cart->get_cart_subtotal(),
+                'cart_hash' => WC()->cart->get_cart_hash(),
+                'items' => $cart_items,
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('Exception in handle_cart_update', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            wp_send_json_error(['message' => __('An error occurred.', 'cart-quote-woocommerce-email')]);
         }
-
-        // Calculate totals to ensure everything is up to date
-        WC()->cart->calculate_totals();
-
-        // Build cart items data for frontend update (eliminates second AJAX call)
-        $cart_items = [];
-        foreach (WC()->cart->get_cart() as $item_key => $cart_item) {
-            $product = $cart_item['data'];
-            $cart_items[] = [
-                'key' => $item_key,
-                'quantity' => $cart_item['quantity'],
-                'line_total' => wc_price($cart_item['line_total']),
-            ];
-        }
-
-        wp_send_json_success([
-            'message' => __('Cart updated.', 'cart-quote-woocommerce-email'),
-            'cart_count' => WC()->cart->get_cart_contents_count(),
-            'subtotal' => WC()->cart->get_cart_subtotal(),
-            'cart_hash' => WC()->cart->get_cart_hash(),
-            'items' => $cart_items,
-        ]);
     }
 
     /**
@@ -198,30 +208,37 @@ class Frontend_Manager
      */
     public function handle_remove_item()
     {
-        $cart_item_key = sanitize_text_field($_POST['cart_item_key'] ?? '');
+        try {
+            $cart_item_key = sanitize_text_field($_POST['cart_item_key'] ?? '');
 
-        if (empty($cart_item_key)) {
-            wp_send_json_error(['message' => __('Invalid cart item.', 'cart-quote-woocommerce-email')]);
-        }
+            if (empty($cart_item_key)) {
+                wp_send_json_error(['message' => __('Invalid cart item.', 'cart-quote-woocommerce-email')]);
+            }
 
-        // Make sure WooCommerce cart is available
-        if (!function_exists('WC') || !WC()->cart) {
-            wp_send_json_error(['message' => __('Cart not available.', 'cart-quote-woocommerce-email')]);
-        }
+            if (!function_exists('WC') || !WC()->cart) {
+                $this->logger->error('Remove item failed: WooCommerce cart not available');
+                wp_send_json_error(['message' => __('Cart not available.', 'cart-quote-woocommerce-email')]);
+            }
 
-        $removed = WC()->cart->remove_cart_item($cart_item_key);
+            $removed = WC()->cart->remove_cart_item($cart_item_key);
 
-        if ($removed) {
-            // Calculate totals after removal
-            WC()->cart->calculate_totals();
-            
-            wp_send_json_success([
-                'message' => __('Item removed.', 'cart-quote-woocommerce-email'),
-                'cart_count' => WC()->cart->get_cart_contents_count(),
-                'subtotal' => WC()->cart->get_cart_subtotal(),
+            if ($removed) {
+                WC()->cart->calculate_totals();
+                
+                wp_send_json_success([
+                    'message' => __('Item removed.', 'cart-quote-woocommerce-email'),
+                    'cart_count' => WC()->cart->get_cart_contents_count(),
+                    'subtotal' => WC()->cart->get_cart_subtotal(),
+                ]);
+            } else {
+                $this->logger->warning('Failed to remove cart item', ['cart_item_key' => $cart_item_key]);
+                wp_send_json_error(['message' => __('Failed to remove item.', 'cart-quote-woocommerce-email')]);
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('Exception in handle_remove_item', [
+                'exception' => $e->getMessage(),
             ]);
-        } else {
-            wp_send_json_error(['message' => __('Failed to remove item.', 'cart-quote-woocommerce-email')]);
+            wp_send_json_error(['message' => __('An error occurred.', 'cart-quote-woocommerce-email')]);
         }
     }
 

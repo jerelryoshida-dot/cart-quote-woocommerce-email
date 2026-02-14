@@ -13,32 +13,21 @@
 
 namespace CartQuoteWooCommerce\WooCommerce;
 
-/**
- * Class Checkout_Replacement
- */
+use CartQuoteWooCommerce\Core\Debug_Logger;
+
 class Checkout_Replacement
 {
-    /**
-     * Quote repository
-     *
-     * @var Quote_Repository
-     */
     private $repository;
 
-    /**
-     * Email service
-     *
-     * @var Email_Service
-     */
     private $email_service;
 
-    /**
-     * Constructor
-     */
+    private $logger;
+
     public function __construct()
     {
         $this->repository = new \CartQuoteWooCommerce\Database\Quote_Repository();
         $this->email_service = new \CartQuoteWooCommerce\Emails\Email_Service();
+        $this->logger = Debug_Logger::get_instance();
     }
 
     /**
@@ -327,74 +316,100 @@ class Checkout_Replacement
      */
     public function handle_quote_submission()
     {
-        // Verify nonce
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'cart_quote_frontend_nonce')) {
-            wp_send_json_error(['message' => __('Security verification failed.', 'cart-quote-woocommerce-email')]);
-            return;
+        try {
+            if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'cart_quote_frontend_nonce')) {
+                $this->logger->warning('Security verification failed', ['ip' => $this->get_client_ip()]);
+                wp_send_json_error(['message' => __('Security verification failed.', 'cart-quote-woocommerce-email')]);
+                return;
+            }
+
+            if (!function_exists('WC') || !WC()->cart || WC()->cart->is_empty()) {
+                $this->logger->error('Quote submission failed: Cart is empty');
+                wp_send_json_error(['message' => __('Your cart is empty.', 'cart-quote-woocommerce-email')]);
+                return;
+            }
+
+            $form_data = $this->sanitize_form_data($_POST);
+
+            $validation = $this->validate_form_data($form_data);
+            if (is_wp_error($validation)) {
+                $this->logger->warning('Quote validation failed', [
+                    'errors' => $validation->get_error_messages(),
+                ]);
+                wp_send_json_error(['message' => $validation->get_error_message()]);
+                return;
+            }
+
+            $cart_data = $this->prepare_cart_data();
+
+            $quote_id = $this->repository->generate_quote_id();
+
+            $insert_data = [
+                'quote_id' => $quote_id,
+                'customer_name' => $form_data['billing_first_name'] . ' ' . $form_data['billing_last_name'],
+                'email' => $form_data['billing_email'],
+                'phone' => isset($form_data['billing_phone']) ? $form_data['billing_phone'] : '',
+                'company_name' => isset($form_data['billing_company']) ? $form_data['billing_company'] : '',
+                'preferred_date' => isset($form_data['preferred_date']) ? $form_data['preferred_date'] : '',
+                'preferred_time' => isset($form_data['preferred_time']) ? $form_data['preferred_time'] : '',
+                'contract_duration' => isset($form_data['contract_duration_final']) ? $form_data['contract_duration_final'] : '',
+                'meeting_requested' => !empty($form_data['meeting_requested']) ? 1 : 0,
+                'additional_notes' => isset($form_data['additional_notes']) ? $form_data['additional_notes'] : '',
+                'cart_data' => $cart_data,
+                'subtotal' => WC()->cart->get_subtotal(),
+            ];
+
+            $insert_id = $this->repository->insert($insert_data);
+
+            if (!$insert_id) {
+                $this->logger->error('Failed to save quote to database', [
+                    'quote_id' => $quote_id,
+                    'form_data' => $form_data,
+                ]);
+                wp_send_json_error(['message' => __('Failed to save quote. Please try again.', 'cart-quote-woocommerce-email')]);
+                return;
+            }
+
+            $this->logger->info('Quote submitted successfully', [
+                'quote_id' => $quote_id,
+                'quote_id' => $quote_id,
+                'customer_name' => $form_data['billing_first_name'] . ' ' . $form_data['billing_last_name'],
+                'email' => $form_data['billing_email'],
+            ]);
+
+            $this->email_service->send_quote_emails($insert_id);
+
+            do_action('cart_quote_after_submission', $insert_id, $quote_id, $insert_data);
+
+            $redirect_url = add_query_arg([
+                'quote_submitted' => '1',
+                'quote_id' => $quote_id,
+            ], function_exists('wc_get_cart_url') ? wc_get_cart_url() : home_url());
+
+            wp_send_json_success([
+                'message' => __('Quote submitted successfully!', 'cart-quote-woocommerce-email'),
+                'quote_id' => $quote_id,
+                'redirect_url' => $redirect_url,
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('Exception in handle_quote_submission', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'post_data' => $_POST,
+            ]);
+            wp_send_json_error(['message' => __('An error occurred.', 'cart-quote-woocommerce-email')]);
         }
+    }
 
-        // Check cart
-        if (!function_exists('WC') || !WC()->cart || WC()->cart->is_empty()) {
-            wp_send_json_error(['message' => __('Your cart is empty.', 'cart-quote-woocommerce-email')]);
-            return;
+    private function get_client_ip()
+    {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            return $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         }
-
-        // Sanitize and validate form data
-        $form_data = $this->sanitize_form_data($_POST);
-
-        // Validate required fields
-        $validation = $this->validate_form_data($form_data);
-        if (is_wp_error($validation)) {
-            wp_send_json_error(['message' => $validation->get_error_message()]);
-            return;
-        }
-
-        // Prepare cart data
-        $cart_data = $this->prepare_cart_data();
-
-        // Generate quote ID
-        $quote_id = $this->repository->generate_quote_id();
-
-        // Insert quote
-        $insert_data = [
-            'quote_id' => $quote_id,
-            'customer_name' => $form_data['billing_first_name'] . ' ' . $form_data['billing_last_name'],
-            'email' => $form_data['billing_email'],
-            'phone' => isset($form_data['billing_phone']) ? $form_data['billing_phone'] : '',
-            'company_name' => isset($form_data['billing_company']) ? $form_data['billing_company'] : '',
-            'preferred_date' => isset($form_data['preferred_date']) ? $form_data['preferred_date'] : '',
-            'preferred_time' => isset($form_data['preferred_time']) ? $form_data['preferred_time'] : '',
-            'contract_duration' => isset($form_data['contract_duration_final']) ? $form_data['contract_duration_final'] : '',
-            'meeting_requested' => !empty($form_data['meeting_requested']) ? 1 : 0,
-            'additional_notes' => isset($form_data['additional_notes']) ? $form_data['additional_notes'] : '',
-            'cart_data' => $cart_data,
-            'subtotal' => WC()->cart->get_subtotal(),
-        ];
-
-        $insert_id = $this->repository->insert($insert_data);
-
-        if (!$insert_id) {
-            wp_send_json_error(['message' => __('Failed to save quote. Please try again.', 'cart-quote-woocommerce-email')]);
-            return;
-        }
-
-        // Send emails
-        $this->email_service->send_quote_emails($insert_id);
-
-        // Trigger action for extensibility
-        do_action('cart_quote_after_submission', $insert_id, $quote_id, $insert_data);
-
-        // Return success with redirect
-        $redirect_url = add_query_arg([
-            'quote_submitted' => '1',
-            'quote_id' => $quote_id,
-        ], function_exists('wc_get_cart_url') ? wc_get_cart_url() : home_url());
-
-        wp_send_json_success([
-            'message' => __('Quote submitted successfully!', 'cart-quote-woocommerce-email'),
-            'quote_id' => $quote_id,
-            'redirect_url' => $redirect_url,
-        ]);
     }
 
     /**

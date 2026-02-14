@@ -9,17 +9,13 @@
 
 namespace CartQuoteWooCommerce\Google;
 
-/**
- * Class Google_Calendar_Service
- */
+use CartQuoteWooCommerce\Core\Debug_Logger;
+
 class Google_Calendar_Service
 {
-    /**
-     * Quote repository
-     *
-     * @var Quote_Repository
-     */
     private $repository;
+
+    private $logger;
 
     /**
      * OAuth scopes
@@ -50,6 +46,7 @@ class Google_Calendar_Service
     public function __construct()
     {
         $this->repository = new \CartQuoteWooCommerce\Database\Quote_Repository();
+        $this->logger = Debug_Logger::get_instance();
     }
 
     /**
@@ -122,16 +119,25 @@ class Google_Calendar_Service
         ]);
 
         if (is_wp_error($response)) {
+            $this->logger->error('OAuth code exchange failed: WP_Error', [
+                'error_message' => $response->get_error_message(),
+            ]);
             return false;
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
 
         if (isset($body['error'])) {
+            $this->logger->error('OAuth code exchange failed: API error', [
+                'error' => $body['error'],
+                'error_description' => $body['error_description'] ?? 'Unknown error',
+            ]);
             return false;
         }
 
         \CartQuoteWooCommerce\Admin\Settings::save_google_tokens($body);
+
+        $this->logger->info('Google OAuth connected successfully');
 
         return $body;
     }
@@ -144,6 +150,7 @@ class Google_Calendar_Service
         $refresh_token = \CartQuoteWooCommerce\Admin\Settings::get_google_refresh_token();
         
         if (empty($refresh_token)) {
+            $this->logger->warning('Token refresh failed: no refresh token stored');
             return false;
         }
 
@@ -157,12 +164,19 @@ class Google_Calendar_Service
         ]);
 
         if (is_wp_error($response)) {
+            $this->logger->error('Token refresh failed: WP_Error', [
+                'error_message' => $response->get_error_message(),
+            ]);
             return false;
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
 
         if (isset($body['error'])) {
+            $this->logger->error('Token refresh failed: API error', [
+                'error' => $body['error'],
+                'error_description' => $body['error_description'] ?? 'Unknown error',
+            ]);
             return false;
         }
 
@@ -176,6 +190,8 @@ class Google_Calendar_Service
         }
 
         \CartQuoteWooCommerce\Admin\Settings::save_google_tokens($tokens);
+
+        $this->logger->info('Google access token refreshed successfully');
 
         return true;
     }
@@ -202,6 +218,7 @@ class Google_Calendar_Service
         $access_token = \CartQuoteWooCommerce\Admin\Settings::get_google_access_token();
         
         if (empty($access_token)) {
+            $this->logger->warning('API request failed: no access token available');
             return false;
         }
 
@@ -222,6 +239,11 @@ class Google_Calendar_Service
         $response = wp_remote_request($url, $args);
 
         if (is_wp_error($response)) {
+            $this->logger->error('Google API request failed: WP_Error', [
+                'endpoint' => $endpoint,
+                'method' => $method,
+                'error_message' => $response->get_error_message(),
+            ]);
             return false;
         }
 
@@ -229,7 +251,13 @@ class Google_Calendar_Service
         $response_body = json_decode(wp_remote_retrieve_body($response), true);
 
         if ($code >= 400) {
-            error_log('Google Calendar API Error: ' . print_r($response_body, true));
+            $this->logger->error('Google Calendar API error', [
+                'endpoint' => $endpoint,
+                'method' => $method,
+                'status_code' => $code,
+                'error' => $response_body['error'] ?? 'Unknown error',
+                'message' => $response_body['error']['message'] ?? 'No message',
+            ]);
             return false;
         }
 
@@ -242,6 +270,7 @@ class Google_Calendar_Service
     public function create_event($quote)
     {
         if (!$this->is_connected()) {
+            $this->logger->warning('Cannot create Google event: not connected');
             return false;
         }
 
@@ -256,6 +285,12 @@ class Google_Calendar_Service
             $end_datetime = clone $start_datetime;
             $end_datetime->add(new \DateInterval('PT' . $duration . 'M'));
         } catch (\Exception $e) {
+            $this->logger->error('Failed to create DateTime for Google event', [
+                'quote_id' => $quote->quote_id ?? 'unknown',
+                'date' => $date,
+                'time' => $time,
+                'exception' => $e->getMessage(),
+            ]);
             return false;
         }
 
@@ -299,8 +334,17 @@ class Google_Calendar_Service
                 get_current_user_id()
             );
 
+            $this->logger->info('Google Calendar event created', [
+                'quote_id' => $quote->quote_id,
+                'event_id' => $response['id'],
+            ]);
+
             return $response;
         }
+
+        $this->logger->error('Failed to create Google Calendar event', [
+            'quote_id' => $quote->quote_id ?? 'unknown',
+        ]);
 
         return false;
     }
