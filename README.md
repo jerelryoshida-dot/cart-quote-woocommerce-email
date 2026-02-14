@@ -16,13 +16,13 @@ Transform WooCommerce checkout into a quote submission system with Google Calend
 
 ### How It Works
 
-```
-Customer adds to cart → Fills quote form → Submits request (no payment)
-                                            ↓
-                              Admin reviews → Creates meeting (optional)
-                                            ↓
-                              Client receives confirmation email
-```
+| Step | Action | Result |
+|:----:|--------|--------|
+| 1️⃣ | Customer adds products/services to cart | Cart ready for quote |
+| 2️⃣ | Fills out quote form (name, company, dates) | Quote request created |
+| 3️⃣ | Submits request | Admin notified, client confirmed |
+| 4️⃣ | Admin reviews & creates meeting (optional) | Google Calendar event sent |
+| 5️⃣ | Client receives confirmation | Meeting invite in email |
 
 ### Key Features
 
