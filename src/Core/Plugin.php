@@ -38,7 +38,7 @@ final class Plugin
      *
      * @var string
      */
-    private $version = '1.0.11';
+    private $version = '1.0.13';
 
     /**
      * Get singleton instance
@@ -148,6 +148,9 @@ final class Plugin
 
         // Body class
         add_filter('body_class', [$this, 'add_body_class']);
+
+        // Register health check
+        \CartQuoteWooCommerce\Admin\Health_Check::register_health_check();
     }
 
     /**
