@@ -22,6 +22,11 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
     /**
      * Get widget name
      */
+    /**
+     * Get widget name
+     *
+     * @return string
+     */
     public function get_name()
     {
         return 'cart_quote_form';
@@ -125,6 +130,16 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                 'label_on' => __('Yes', 'cart-quote-woocommerce-email'),
                 'label_off' => __('No', 'cart-quote-woocommerce-email'),
                 'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
+            'meeting_checkbox_label',
+            [
+                'label' => __('Meeting Checkbox Label', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('Request a meeting', 'cart-quote-woocommerce-email'),
+                'separator' => 'before',
             ]
         );
 
@@ -542,7 +557,7 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                     </div>
                 <?php endif; ?>
 
-                <div class="cart-quote-form-row">
+                <div class="cart-quote-form-row cart-quote-meeting-fields" style="display: none;">
                     <?php if ($settings['show_preferred_date'] === 'yes') : ?>
                         <div class="cart-quote-field">
                             <label for="preferred_date">
@@ -552,7 +567,6 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                             <input type="date" 
                                    id="preferred_date" 
                                    name="preferred_date" 
-                                   required
                                    min="<?php echo esc_attr(date('Y-m-d')); ?>"
                                    class="cart-quote-input">
                         </div>
@@ -604,7 +618,7 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                     <div class="cart-quote-field cart-quote-field-checkbox">
                         <label class="cart-quote-checkbox-label">
                             <input type="checkbox" name="meeting_requested" id="meeting_requested" value="1">
-                            <span><?php esc_html_e('Request a meeting', 'cart-quote-woocommerce-email'); ?></span>
+                            <span><?php echo esc_html($settings['meeting_checkbox_label']); ?></span>
                         </label>
                     </div>
                 <?php endif; ?>
@@ -707,16 +721,16 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                 </div>
                 <# } #>
 
-                <div class="cart-quote-form-row">
+                <div class="cart-quote-form-row cart-quote-meeting-fields" style="display: none;">
                     <# if (settings.show_preferred_date === 'yes') { #>
                     <div class="cart-quote-field">
                         <label><?php esc_html_e('Preferred Start Date', 'cart-quote-woocommerce-email'); ?> <span class="required">*</span></label>
-                        <input type="date" class="cart-quote-input">
+                        <input type="date" id="preferred_date" class="cart-quote-input">
                     </div>
                     <# } #>
                     <div class="cart-quote-field">
                         <label><?php esc_html_e('Preferred Meeting Time', 'cart-quote-woocommerce-email'); ?></label>
-                        <select class="cart-quote-select">
+                        <select id="preferred_time" class="cart-quote-select">
                             <option><?php esc_html_e('Select a time slot', 'cart-quote-woocommerce-email'); ?></option>
                             <option>9:00 AM</option>
                             <option>11:00 AM</option>
@@ -742,8 +756,8 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                 <# if (settings.show_meeting_toggle === 'yes') { #>
                 <div class="cart-quote-field cart-quote-field-checkbox">
                     <label class="cart-quote-checkbox-label">
-                        <input type="checkbox">
-                        <span><?php esc_html_e('Request a meeting', 'cart-quote-woocommerce-email'); ?></span>
+                        <input type="checkbox" id="meeting_requested">
+                        <span>{{{ settings.meeting_checkbox_label }}}</span>
                     </label>
                 </div>
                 <# } #>

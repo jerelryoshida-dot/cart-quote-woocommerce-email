@@ -247,17 +247,52 @@
 
             // Validate required fields
             var isValid = true;
-            $form.find('[required]').each(function() {
+            var errorMessage = '';
+            
+            // Check if meeting is requested
+            var meetingRequested = $('#meeting_requested').is(':checked');
+            
+            // If meeting is requested, validate date and time
+            if (meetingRequested) {
+                var $dateField = $('#preferred_date');
+                var $timeField = $('#preferred_time');
+                
+                if ($dateField.length && !$dateField.val()) {
+                    $dateField.addClass('error');
+                    isValid = false;
+                    errorMessage = 'Please select a preferred start date for your meeting.\n';
+                } else if ($dateField.length) {
+                    $dateField.removeClass('error');
+                }
+                
+                if ($timeField.length && !$timeField.val()) {
+                    $timeField.addClass('error');
+                    isValid = false;
+                    if (!errorMessage) {
+                        errorMessage = 'Please select a preferred meeting time.\n';
+                    } else {
+                        errorMessage += 'Please select a preferred meeting time.\n';
+                    }
+                } else if ($timeField.length) {
+                    $timeField.removeClass('error');
+                }
+            }
+            
+            // Validate other required fields
+            $form.find('[required]').not('#preferred_date').each(function() {
                 if (!$(this).val()) {
                     $(this).addClass('error');
                     isValid = false;
+                    if (!errorMessage) {
+                        errorMessage = 'Please fill in all required fields.';
+                    }
                 } else {
                     $(this).removeClass('error');
                 }
             });
 
             if (!isValid) {
-                alert('Please fill in all required fields.');
+                alert(errorMessage || 'Please fill in all required fields.');
                 return;
             }
 
@@ -291,6 +326,24 @@
                         $submitBtn.prop('disabled', false).text(originalText);
                     }
                 });
+            }
+        });
+
+        // Meeting checkbox toggle - show/hide date/time fields
+        $(document).on('change', '#meeting_requested', function() {
+            var $meetingFields = $('.cart-quote-meeting-fields');
+            var $dateField = $('#preferred_date');
+            
+            if ($(this).is(':checked')) {
+                $meetingFields.slideDown();
+                if ($dateField.length) {
+                    $dateField.attr('required', 'required');
+                }
+            } else {
+                $meetingFields.slideUp();
+                if ($dateField.length) {
+                    $dateField.removeAttr('required');
+                }
             }
         });
 

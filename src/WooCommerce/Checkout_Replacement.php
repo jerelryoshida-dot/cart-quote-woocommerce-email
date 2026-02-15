@@ -493,8 +493,14 @@ class Checkout_Replacement
             $errors->add('required', __('Company name is required.', 'cart-quote-woocommerce-email'));
         }
 
-        if (empty($data['preferred_date'])) {
-            $errors->add('required', __('Preferred start date is required.', 'cart-quote-woocommerce-email'));
+        if ($data['meeting_requested']) {
+            if (empty($data['preferred_date'])) {
+                $errors->add('required', __('Preferred start date is required when requesting a meeting.', 'cart-quote-woocommerce-email'));
+            }
+
+            if (empty($data['preferred_time'])) {
+                $errors->add('required', __('Preferred meeting time is required when requesting a meeting.', 'cart-quote-woocommerce-email'));
+            }
         }
 
         if (empty($data['contract_duration'])) {
