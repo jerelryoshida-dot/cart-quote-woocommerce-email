@@ -1,6 +1,6 @@
 # Cart Quote WooCommerce & Email
 
-[![Version](https://img.shields.io/badge/version-1.0.19-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases)
+[![Version](https://img.shields.io/badge/version-1.0.20-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases)
 [![License](https://img.shields.io/badge/license-GPL--2.0-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-8892BF.svg)](https://php.net)
 [![WordPress](https://img.shields.io/badge/WordPress-%3E%3D5.8-21759B.svg)](https://wordpress.org)
