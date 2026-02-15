@@ -1,0 +1,77 @@
+name: Update Wiki on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update Wiki Update-Log
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get the latest release tag and release notes
+          TAG="${{ github.event.release.tag_name }}"
+          BODY="${{ github.event.release.body }}"
+
+          # Parse release notes to extract changes
+          # Extract version from tag (remove 'v' prefix)
+          VERSION=${TAG#v}
+          RELEASE_DATE=$(date +%Y-%m-%d)
+
+          echo "Updating wiki for version $VERSION"
+
+          # Clone the wiki repository
+          git clone https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.wiki.git wiki
+
+          cd wiki
+
+          # Read current Update-Log.md
+          if [ ! -f "Update-Log.md" ]; then
+            echo "Update-Log.md not found!"
+            exit 1
+          fi
+
+          # Create new entry at the top of Release History section
+          # Find the line with "## Release History" and insert after it
+          # Add new release entry
+
+          # Use sed to insert the new release entry after the "## Release History" header
+          TEMP_FILE=$(mktemp)
+
+          # Add new release entry before existing v1.0.9 entry
+          awk '
+          /## Release History/ { print; print ""; }
+          /## Version Details/ { exit }
+          !/^$/ { print }
+          ' Update-Log.md > "$TEMP_FILE"
+
+          # Add new release entry
+          cat >> "$TEMP_FILE" << EOF
+
+          [v$VERSION](https://github.com/${{ github.repository }}/releases/tag/$TAG)
+          $RELEASE_DATE
+
+          $BODY
+
+          EOF
+
+          # Append the rest of the file (from Version Details section onwards)
+          sed -n '/## Version Details/,$p' Update-Log.md >> "$TEMP_FILE"
+
+          # Replace the original file
+          mv "$TEMP_FILE" Update-Log.md
+
+          # Commit and push
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Update-Log.md
+          git commit -m "Update wiki for release $TAG"
+          git push origin main
