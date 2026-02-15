@@ -489,26 +489,26 @@ class Quote_Repository
      */
     public function get_statistics(): array
     {
+        $sql = "SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+            SUM(CASE WHEN status = 'contacted' THEN 1 ELSE 0 END) as contacted,
+            SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as closed,
+            SUM(CASE WHEN status = 'canceled' THEN 1 ELSE 0 END) as canceled,
+            SUM(CASE WHEN meeting_requested = 1 THEN 1 ELSE 0 END) as meetings_requested,
+            SUM(CASE WHEN calendar_synced = 1 THEN 1 ELSE 0 END) as meetings_scheduled
+        FROM {$this->table_name}";
+
+        $result = $this->wpdb->get_row($sql);
+
         return [
-            'total' => (int) $this->wpdb->get_var("SELECT COUNT(*) FROM {$this->table_name}"),
-            'pending' => (int) $this->wpdb->get_var(
-                $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table_name} WHERE status = %s", 'pending')
-            ),
-            'contacted' => (int) $this->wpdb->get_var(
-                $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table_name} WHERE status = %s", 'contacted')
-            ),
-            'closed' => (int) $this->wpdb->get_var(
-                $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table_name} WHERE status = %s", 'closed')
-            ),
-            'canceled' => (int) $this->wpdb->get_var(
-                $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table_name} WHERE status = %s", 'canceled')
-            ),
-            'meetings_requested' => (int) $this->wpdb->get_var(
-                "SELECT COUNT(*) FROM {$this->table_name} WHERE meeting_requested = 1"
-            ),
-            'meetings_scheduled' => (int) $this->wpdb->get_var(
-                "SELECT COUNT(*) FROM {$this->table_name} WHERE calendar_synced = 1"
-            ),
+            'total' => (int) $result->total,
+            'pending' => (int) $result->pending,
+            'contacted' => (int) $result->contacted,
+            'closed' => (int) $result->closed,
+            'canceled' => (int) $result->canceled,
+            'meetings_requested' => (int) $result->meetings_requested,
+            'meetings_scheduled' => (int) $result->meetings_scheduled,
         ];
     }
 
@@ -520,11 +520,10 @@ class Quote_Repository
      */
     public function export_csv(array $args = []): string
     {
-        $args['per_page'] = 9999;
-        $quotes = $this->get_all($args);
-
+        $args['per_page'] = 500;
+        $offset = 0;
         $csv = [];
-        
+
         // Headers
         $csv[] = [
             'Quote ID',
@@ -542,24 +541,30 @@ class Quote_Repository
             'Google Event ID',
         ];
 
-        // Data rows
-        foreach ($quotes as $quote) {
-            $csv[] = [
-                $quote->quote_id,
-                $quote->customer_name,
-                $quote->email,
-                $quote->phone,
-                $quote->company_name,
-                $quote->preferred_date,
-                $quote->preferred_time,
-                $quote->contract_duration,
-                $quote->meeting_requested ? 'Yes' : 'No',
-                $quote->subtotal,
-                $quote->status,
-                $quote->created_at,
-                $quote->google_event_id,
-            ];
-        }
+        do {
+            $args['page'] = max(1, floor($offset / $args['per_page']) + 1);
+            $quotes = $this->get_all($args);
+
+            foreach ($quotes as $quote) {
+                $csv[] = [
+                    $quote->quote_id,
+                    $quote->customer_name,
+                    $quote->email,
+                    $quote->phone,
+                    $quote->company_name,
+                    $quote->preferred_date,
+                    $quote->preferred_time,
+                    $quote->contract_duration,
+                    $quote->meeting_requested ? 'Yes' : 'No',
+                    $quote->subtotal,
+                    $quote->status,
+                    $quote->created_at,
+                    $quote->google_event_id,
+                ];
+            }
+
+            $offset += $args['per_page'];
+        } while (count($quotes) === $args['per_page']);
 
         // Convert to CSV string
         $output = '';

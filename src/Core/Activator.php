@@ -68,7 +68,11 @@ class Activator
             UNIQUE KEY quote_id (quote_id),
             KEY email (email),
             KEY status (status),
-            KEY created_at (created_at)
+            KEY created_at (created_at),
+            KEY idx_status_created (status, created_at),
+            KEY idx_status_contacted (status, calendar_synced),
+            KEY idx_search (customer_name(50), company_name(50)),
+            KEY idx_meeting_synced (meeting_requested, calendar_synced)
         ) $charset_collate;";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';

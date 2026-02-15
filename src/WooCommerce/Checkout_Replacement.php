@@ -310,6 +310,26 @@ class Checkout_Replacement
                 return;
             }
 
+            $ip = $this->get_client_ip();
+
+            if (\CartQuoteWooCommerce\Core\Rate_Limiter::is_blocked($ip)) {
+                $this->logger->warning('Quote submission blocked: IP is blocked', ['ip' => $ip]);
+                wp_send_json_error([
+                    'message' => __('Too many requests. Please wait before trying again.', 'cart-quote-woocommerce-email'),
+                    'retry_after' => \CartQuoteWooCommerce\Core\Rate_Limiter::get_block_expiration($ip),
+                ]);
+                return;
+            }
+
+            if (!\CartQuoteWooCommerce\Core\Rate_Limiter::check_rate_limit($ip)) {
+                $this->logger->warning('Quote submission blocked: Rate limit exceeded', ['ip' => $ip]);
+                wp_send_json_error([
+                    'message' => __('Rate limit exceeded. Please slow down.', 'cart-quote-woocommerce-email'),
+                    'remaining' => \CartQuoteWooCommerce\Core\Rate_Limiter::get_remaining_attempts($ip),
+                ]);
+                return;
+            }
+
             $form_data = $this->sanitize_form_data($_POST);
 
             $validation = $this->validate_form_data($form_data);
