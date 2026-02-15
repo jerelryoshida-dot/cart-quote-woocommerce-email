@@ -612,6 +612,256 @@
     cursor: not-allowed;
 }
 
+/* Meeting Fields Enhancements */
+.cart-quote-meeting-fields {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 1px solid #e9ecef;
+    border-left: 4px solid #0073aa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 115, 170, 0.08);
+    transition: all 0.3s ease;
+}
+
+.cart-quote-meeting-fields.slide-down {
+    animation: slideDown 0.4s ease-out;
+}
+
+.cart-quote-meeting-fields.slide-up {
+    animation: slideUp 0.3s ease-in;
+}
+
+.cart-quote-meeting-fields h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0073aa;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cart-quote-meeting-fields h4::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 16px;
+    background: #0073aa;
+    border-radius: 2px;
+}
+
+/* Checkbox Styling Enhancements */
+.cart-quote-field-checkbox {
+    padding: 15px 0;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.cart-quote-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 15px;
+    color: #333;
+}
+
+.cart-quote-checkbox-label input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: #0073aa;
+    transition: all 0.2s ease;
+}
+
+.cart-quote-checkbox-label input[type="checkbox"]:checked {
+    accent-color: #0073aa;
+    transform: scale(1.1);
+}
+
+.cart-quote-checkbox-label span {
+    line-height: 1.5;
+}
+
+.field-hint {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #666;
+    font-weight: 400;
+}
+
+.field-error {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Error States */
+.cart-quote-field input.error,
+.cart-quote-field select.error {
+    border: 2px solid #dc3545 !important;
+    background-color: #fff5f5 !important;
+}
+
+.cart-quote-field input.error:focus,
+.cart-quote-field select.error:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2) !important;
+}
+
+.cart-quote-field.error {
+    animation: shake 0.5s ease-in-out;
+}
+
+.error-message-container {
+    background: #fff5f5;
+    border: 1px solid #fecaca;
+    border-radius: 5px;
+    padding: 12px 15px;
+    margin: 15px 0;
+    color: #c53030;
+    font-size: 14px;
+    line-height: 1.5;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.1);
+}
+
+.error-message-container strong {
+    color: #9b2c2c;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* Focused Field States */
+.cart-quote-field:focus-within {
+    border-color: #0073aa;
+    box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.1);
+    border-radius: 5px;
+}
+
+/* Focused Field Animation */
+.cart-quote-field:focus-within {
+    animation: fieldFocus 0.3s ease-in-out;
+}
+
+@keyframes fieldFocus {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.01);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Focus styles for inputs */
+.cart-quote-field:focus-within label {
+    color: #0073aa;
+    font-weight: 600;
+}
+
+/* Checkbox checked state styling */
+.cart-quote-field-checkbox.checkbox-checked {
+    background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+    border-color: #0073aa;
+}
+
+.cart-quote-field-checkbox.checkbox-checked .cart-quote-checkbox-label span {
+    color: #0073aa;
+    font-weight: 600;
+}
+
+/* Time slot select styling improvements */
+.cart-quote-field select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230073aa' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+.cart-quote-field select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230073aa' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+/* Button focus states */
+.cart-quote-submit-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.3);
+}
+
+/* Input focus with error state */
+.cart-quote-field input.error:focus,
+.cart-quote-field select.error:focus {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2) !important;
+}
+
+/* Smooth transitions for all interactive elements */
+.cart-quote-field input,
+.cart-quote-field select,
+.cart-quote-field textarea {
+    transition: all 0.2s ease;
+}
+
+/* Error message animation */
+.error-message-container {
+    animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Success Message */
 .cart-quote-form-success {
     text-align: center;

@@ -557,9 +557,17 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                     </div>
                 <?php endif; ?>
 
-                <div class="cart-quote-form-row cart-quote-meeting-fields" style="display: none;">
+                <div class="cart-quote-form-row cart-quote-meeting-fields" 
+                     style="display: none;" 
+                     role="region"
+                     aria-labelledby="meeting_requested_label">
+                    
+                    <h4 id="meeting_requested_label">
+                        <?php esc_html_e('Meeting Details', 'cart-quote-woocommerce-email'); ?>
+                    </h4>
+                    
                     <?php if ($settings['show_preferred_date'] === 'yes') : ?>
-                        <div class="cart-quote-field">
+                        <div class="cart-quote-field" aria-required="false">
                             <label for="preferred_date">
                                 <?php esc_html_e('Preferred Start Date', 'cart-quote-woocommerce-email'); ?>
                                 <span class="required">*</span>
@@ -568,15 +576,19 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                                    id="preferred_date" 
                                    name="preferred_date" 
                                    min="<?php echo esc_attr(date('Y-m-d')); ?>"
-                                   class="cart-quote-input">
+                                   aria-required="true"
+                                   aria-describedby="preferred_date_error">
+                            <span id="preferred_date_error" class="sr-only"></span>
                         </div>
                     <?php endif; ?>
 
-                    <div class="cart-quote-field">
+                    <div class="cart-quote-field" aria-required="false">
                         <label for="preferred_time">
                             <?php esc_html_e('Preferred Meeting Time', 'cart-quote-woocommerce-email'); ?>
                         </label>
-                        <select id="preferred_time" name="preferred_time" class="cart-quote-select">
+                        <select id="preferred_time" name="preferred_time" 
+                                aria-required="true"
+                                aria-describedby="preferred_time_error">
                             <option value=""><?php esc_html_e('Select a time slot', 'cart-quote-woocommerce-email'); ?></option>
                             <?php foreach ($time_slots as $slot) : ?>
                                 <option value="<?php echo esc_attr($slot); ?>">
@@ -584,6 +596,7 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <span id="preferred_time_error" class="sr-only"></span>
                     </div>
                 </div>
 
@@ -615,11 +628,16 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                 <?php endif; ?>
 
                 <?php if ($settings['show_meeting_toggle'] === 'yes') : ?>
-                    <div class="cart-quote-field cart-quote-field-checkbox">
-                        <label class="cart-quote-checkbox-label">
-                            <input type="checkbox" name="meeting_requested" id="meeting_requested" value="1">
+                    <div class="cart-quote-field cart-quote-field-checkbox" aria-required="false">
+                        <label class="cart-quote-checkbox-label" for="meeting_requested">
+                            <input type="checkbox" 
+                                   name="meeting_requested" 
+                                   id="meeting_requested" 
+                                   value="1"
+                                   aria-required="false">
                             <span><?php echo esc_html($settings['meeting_checkbox_label']); ?></span>
                         </label>
+                        <span class="field-hint"><?php esc_html_e('Select this option to schedule a meeting', 'cart-quote-woocommerce-email'); ?></span>
                     </div>
                 <?php endif; ?>
 
