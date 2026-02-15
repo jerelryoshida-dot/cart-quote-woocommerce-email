@@ -3,7 +3,7 @@
  * Plugin Name: Cart Quote WooCommerce & Email
  * Plugin URI: https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email
  * Description: Transform WooCommerce checkout into a quote submission system with Google Calendar integration and email notifications. No payment processing required.
- * Version: 1.0.21
+ * Version: 1.0.22
  * Author: Jerel Yoshida
  * Author URI: https://github.com/jerelryoshida-dot
  * Text Domain: cart-quote-woocommerce-email
@@ -26,7 +26,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('CART_QUOTE_WC_VERSION', '1.0.21');
+define('CART_QUOTE_WC_VERSION', '1.0.22');
 define('CART_QUOTE_WC_PLUGIN_FILE', __FILE__);
 define('CART_QUOTE_WC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('CART_QUOTE_WC_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -169,11 +169,6 @@ function cart_quote_wc_activate() {
             'Plugin Activation Error',
             ['back_link' => true]
         );
-    }
-
-    // Validate critical files exist before activation
-    if (!\CartQuoteWooCommerce\Core\Validator::validate_and_stop_if_missing()) {
-        return;
     }
 
     try {
