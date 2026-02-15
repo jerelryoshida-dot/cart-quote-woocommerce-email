@@ -49,30 +49,47 @@
                                 var $input = $itemRow.find('.cart-quote-qty-input');
                                 if ($input.length) {
                                     $input.val(item.quantity);
-                                }
-                            }
-                        });
-                    }
-                    
-                    // Update subtotal
-                    if (response.data.subtotal) {
-                        $wrapper.find('.cart-quote-subtotal-amount').html(response.data.subtotal);
-                    }
-                } else {
-                    if (typeof cartQuoteFrontend !== 'undefined' && cartQuoteFrontend.debug) {
-                        console.log('Cart Quote Error:', response.data.message);
-                    }
-                }
-            },
-            error: function(xhr, status, error) {
-                if (typeof cartQuoteFrontend !== 'undefined' && cartQuoteFrontend.debug) {
-                    console.log('Cart Quote AJAX Error:', error);
-                }
-            }
-        });
     }
+}
 
-    // Document ready
+// Error handling utility functions
+function showError($element, message) {
+    var errorContainer = $element.data('error-container');
+    
+    if (!errorContainer) {
+        errorContainer = $('<div class="error-message-container" role="alert"></div>');
+        $element.after(errorContainer);
+        $element.data('error-container', errorContainer);
+    }
+    
+    errorContainer
+        .stop(true, true)
+        .html(message)
+        .fadeIn(200)
+        .scrollTop();
+    
+    return errorContainer;
+}
+
+function hideError($element) {
+    var errorContainer = $element.data('error-container');
+    
+    if (errorContainer) {
+        errorContainer
+            .stop(true, true)
+            .fadeOut(150, function() {
+                $(this).empty();
+            });
+    }
+}
+
+// Email validation helper
+function isValidEmail(email) {
+    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// Document ready
     $(document).ready(function() {
         
         // Handle + button click for Quote Form
@@ -236,7 +253,7 @@
             });
         });
 
-        // Quote form submission
+        // Enhanced quote form submission with better validation
         $(document).on('submit', '#cart-quote-form', function(e) {
             e.preventDefault();
 
@@ -245,54 +262,99 @@
             var $submitBtn = $form.find('.cart-quote-submit-btn');
             var originalText = $submitBtn.text();
 
-            // Validate required fields
             var isValid = true;
             var errorMessage = '';
-            
+
+            // Reset all errors
+            $form.find('.error').removeClass('error');
+            $('.error-message-container').hide();
+            $form.find('.field-error').removeClass('field-error');
+
             // Check if meeting is requested
             var meetingRequested = $('#meeting_requested').is(':checked');
-            
+
             // If meeting is requested, validate date and time
             if (meetingRequested) {
                 var $dateField = $('#preferred_date');
                 var $timeField = $('#preferred_time');
-                
-                if ($dateField.length && !$dateField.val()) {
+
+                var dateError = '';
+                var timeError = '';
+
+                if (!$dateField.val()) {
                     $dateField.addClass('error');
-                    isValid = false;
-                    errorMessage = 'Please select a preferred start date for your meeting.\n';
-                } else if ($dateField.length) {
-                    $dateField.removeClass('error');
+                    dateError = '<strong>Date Error:</strong> Please select a preferred start date for your meeting.';
+                    $dateField.parent().addClass('field-error');
                 }
-                
-                if ($timeField.length && !$timeField.val()) {
+
+                if (!$timeField.val()) {
                     $timeField.addClass('error');
+                    timeError = '<strong>Time Error:</strong> Please select a preferred meeting time.';
+                    $timeField.parent().addClass('field-error');
+                }
+
+                // Show appropriate error message
+                if (dateError || timeError) {
+                    showError($form, dateError + '<br>' + timeError);
                     isValid = false;
-                    if (!errorMessage) {
-                        errorMessage = 'Please select a preferred meeting time.\n';
-                    } else {
-                        errorMessage += 'Please select a preferred meeting time.\n';
-                    }
-                } else if ($timeField.length) {
-                    $timeField.removeClass('error');
+
+                    // Scroll to first error
+                    $form.find('.error').first().focus();
+                    $form.find('.error-message-container').show();
+
+                    return;
+                }
+
+                // Additional date validation
+                var selectedDate = new Date($dateField.val());
+                var today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (selectedDate < today) {
+                    $dateField.addClass('error');
+                    showError($form, '<strong>Date Error:</strong> Please select a future date.');
+                    $dateField.parent().addClass('field-error');
+                    isValid = false;
+                    return;
                 }
             }
-            
+
             // Validate other required fields
             $form.find('[required]').not('#preferred_date').each(function() {
-                if (!$(this).val()) {
-                    $(this).addClass('error');
-                    isValid = false;
+                var $field = $(this);
+                
+                if (!$field.val()) {
+                    $field.addClass('error');
+                    $field.parent().addClass('field-error');
+                    
                     if (!errorMessage) {
                         errorMessage = 'Please fill in all required fields.';
                     }
                 } else {
-                    $(this).removeClass('error');
+                    // Validate email format
+                    if ($field.attr('type') === 'email' && !isValidEmail($field.val())) {
+                        $field.addClass('error');
+                        showError($form, '<strong>Email Error:</strong> Please enter a valid email address.');
+                        isValid = false;
+                        return;
+                    }
+                    
+                    // Validate phone format (optional validation)
+                    if ($field.attr('type') === 'tel' && $field.val()) {
+                        var phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
+                        if (!phoneRegex.test($field.val())) {
+                            $field.addClass('error');
+                            showError($form, '<strong>Phone Error:</strong> Please enter a valid phone number.');
+                            isValid = false;
+                            return;
+                        }
+                    }
                 }
             });
 
             if (!isValid) {
-                alert(errorMessage || 'Please fill in all required fields.');
+                $form.find('.error').first().focus();
+                $form.find('.error-message-container').show();
                 return;
             }
 
@@ -317,33 +379,67 @@
                                 }, 2000);
                             }
                         } else {
-                            alert(response.data.message || 'An error occurred.');
+                            showError($form, '<strong>Error:</strong> ' + (response.data.message || 'An error occurred.'));
                             $submitBtn.prop('disabled', false).text(originalText);
                         }
                     },
                     error: function() {
-                        alert('An error occurred. Please try again.');
+                        showError($form, '<strong>Error:</strong> An error occurred. Please try again.');
                         $submitBtn.prop('disabled', false).text(originalText);
                     }
                 });
             }
         });
 
-        // Meeting checkbox toggle - show/hide date/time fields
+        // Enhanced meeting checkbox toggle with better animations
         $(document).on('change', '#meeting_requested', function() {
             var $meetingFields = $('.cart-quote-meeting-fields');
             var $dateField = $('#preferred_date');
+            var $timeField = $('#preferred_time');
+            var isChecked = $(this).is(':checked');
             
-            if ($(this).is(':checked')) {
-                $meetingFields.slideDown();
-                if ($dateField.length) {
-                    $dateField.attr('required', 'required');
-                }
+            if (isChecked) {
+                // Show fields with animation
+                $meetingFields
+                    .stop(true, true)
+                    .slideDown({
+                        duration: 300,
+                        easing: 'easeInOutCubic',
+                        complete: function() {
+                            $dateField.focus();
+                            $dateField.addClass('focused-field');
+                        }
+                    });
+                
+                // Update ARIA attributes for accessibility
+                $meetingFields.attr('aria-hidden', 'false');
+                $meetingFields.find('input, select').attr('aria-required', 'true');
+                
+                // Add visual feedback for checkbox
+                $(this).closest('.cart-quote-field').addClass('checkbox-checked');
+                
             } else {
-                $meetingFields.slideUp();
-                if ($dateField.length) {
-                    $dateField.removeAttr('required');
-                }
+                // Hide fields with animation
+                $meetingFields
+                    .stop(true, true)
+                    .slideUp({
+                        duration: 250,
+                        easing: 'easeInCubic',
+                        complete: function() {
+                            // Remove error states
+                            $meetingFields.find('.error').removeClass('error');
+                            $dateField.removeAttr('aria-required');
+                            $timeField.removeAttr('aria-required');
+                            $dateField.removeClass('focused-field');
+                            $timeField.removeClass('focused-field');
+                        }
+                    });
+                
+                // Update ARIA attributes
+                $meetingFields.attr('aria-hidden', 'true');
+                
+                // Remove visual feedback for checkbox
+                $(this).closest('.cart-quote-field').removeClass('checkbox-checked');
             }
         });
 
