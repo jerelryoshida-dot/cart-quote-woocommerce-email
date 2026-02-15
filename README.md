@@ -232,6 +232,7 @@ cart-quote-woocommerce-email/
 
 | Version | Date | Changes |
 |---------|------|---------|
+| [1.0.9](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.9) | 2026-02-15 | Code cleanup & bug fixes: syntax error, checkbox handling, removed unused code, enhanced IP validation, division by zero protection |
 | [1.0.8](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.8) | 2026-02-14 | Bug fixes: version mismatch, duplicate cart clearing, additional_notes field |
 | [1.0.7](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.7) | 2026-02-14 | Initial release |
 
@@ -272,6 +273,16 @@ GPL-2.0-or-later. See [GNU General Public License](https://www.gnu.org/licenses/
 ---
 
 ## Changelog
+
+### 1.0.9
+* Fixed syntax error in quote detail template
+* Fixed checkbox handling in admin settings
+* Removed unused methods (get_status_label, get_status_class, format_price)
+* Removed duplicate nonce verification
+* Enhanced IP validation with FILTER_VALIDATE_IP
+* Added division by zero protection
+* Added asset file existence checks
+* Simplified code with null coalescing operator
 
 ### 1.0.8
 * Fixed version mismatch in Plugin.php
