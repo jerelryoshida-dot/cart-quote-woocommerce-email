@@ -4,7 +4,7 @@ Tags: woocommerce, quote, cart, email, google calendar, elementor
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 1.0.10
+Stable tag: 1.0.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,8 +136,20 @@ Yes. Google OAuth tokens are encrypted before storage. All database queries use 
   - IP blocking for excessive requests
   - IP whitelist support
 * 📝 Testing infrastructure:
-  - Expanded unit tests for Email_Service and Google_Calendar_Service
-  - Added integration tests for full quote flow
+   - Expanded unit tests for Email_Service and Google_Calendar_Service
+   - Added integration tests for full quote flow
+
+= 1.0.11 =
+* ✨ Quote Form Widget enhancements:
+  - Date and time fields now only appear when meeting checkbox is checked
+  - Added customizable meeting checkbox label in Elementor widget settings
+  - Submit button text customization (existing feature)
+  - Enhanced JavaScript validation for date/time when meeting requested
+  - Updated backend validation to require date/time only when meeting requested
+* 🎨 Improved user experience:
+  - Cleaner form layout by hiding unnecessary fields by default
+  - Better validation messages for missing required fields
+  - Conditional field display reduces form complexity
 
 = 1.0.9 =
 * Initial release
