@@ -63,20 +63,30 @@ if (!defined('ABSPATH')) {
 
         <h3><?php esc_html_e('Quote Details', 'cart-quote-woocommerce-email'); ?></h3>
 
-        <div class="cart-quote-form-row">
-            <div class="cart-quote-field">
+        <div class="cart-quote-form-row cart-quote-meeting-fields" 
+             style="display: none;" 
+             role="region"
+             aria-labelledby="meeting_requested_label">
+            
+            <h4 id="meeting_requested_label">
+                <?php esc_html_e('Meeting Details', 'cart-quote-woocommerce-email'); ?>
+            </h4>
+            
+            <div class="cart-quote-field" aria-required="false">
                 <label for="preferred_date">
                     <?php esc_html_e('Preferred Start Date', 'cart-quote-woocommerce-email'); ?>
                     <span class="required">*</span>
                 </label>
-                <input type="date" id="preferred_date" name="preferred_date" required min="<?php echo esc_attr(date('Y-m-d')); ?>" class="cart-quote-input">
+                <input type="date" id="preferred_date" name="preferred_date" min="<?php echo esc_attr(date('Y-m-d')); ?>" class="cart-quote-input" aria-required="true">
+                <span class="sr-only"></span>
             </div>
 
-            <div class="cart-quote-field">
+            <div class="cart-quote-field" aria-required="false">
                 <label for="preferred_time">
                     <?php esc_html_e('Preferred Meeting Time', 'cart-quote-woocommerce-email'); ?>
                 </label>
-                <select id="preferred_time" name="preferred_time" class="cart-quote-select">
+                <select id="preferred_time" name="preferred_time" 
+                        aria-required="true">
                     <option value=""><?php esc_html_e('Select a time slot', 'cart-quote-woocommerce-email'); ?></option>
                     <?php foreach ($time_slots as $slot) : ?>
                         <option value="<?php echo esc_attr($slot); ?>">
@@ -84,6 +94,7 @@ if (!defined('ABSPATH')) {
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <span class="sr-only"></span>
             </div>
         </div>
 
@@ -108,11 +119,16 @@ if (!defined('ABSPATH')) {
             <input type="text" id="custom_duration" name="custom_duration" class="cart-quote-input" placeholder="<?php esc_attr_e('e.g., 2 months, 1 year', 'cart-quote-woocommerce-email'); ?>">
         </div>
 
-        <div class="cart-quote-field cart-quote-field-checkbox">
-            <label class="cart-quote-checkbox-label">
-                <input type="checkbox" name="meeting_requested" id="meeting_requested" value="1">
+        <div class="cart-quote-field cart-quote-field-checkbox" aria-required="false">
+            <label class="cart-quote-checkbox-label" for="meeting_requested">
+                <input type="checkbox" 
+                       name="meeting_requested" 
+                       id="meeting_requested" 
+                       value="1"
+                       aria-required="false">
                 <span><?php esc_html_e('Request a meeting', 'cart-quote-woocommerce-email'); ?></span>
             </label>
+            <span class="field-hint"><?php esc_html_e('Select this option to schedule a meeting', 'cart-quote-woocommerce-email'); ?></span>
         </div>
 
         <div class="cart-quote-field">
