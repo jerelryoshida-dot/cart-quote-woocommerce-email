@@ -598,7 +598,7 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                     </div>
                 <?php endif; ?>
 
-                <div class="cart-quote-form-row cart-quote-meeting-fields" 
+                <div class="cart-quote-meeting-fields" 
                      style="display: none;" 
                      role="region"
                      aria-labelledby="meeting_requested_label">
