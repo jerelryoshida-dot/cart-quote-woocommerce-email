@@ -603,41 +603,45 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                      role="region"
                      aria-labelledby="meeting_requested_label">
                     
-                    <h4 id="meeting_requested_label">
-                        <?php esc_html_e('Meeting Details', 'cart-quote-woocommerce-email'); ?>
-                    </h4>
+                    <div class="cart-quote-meeting-header">
+                        <h4 id="meeting_requested_label">
+                            <?php esc_html_e('Meeting Details', 'cart-quote-woocommerce-email'); ?>
+                        </h4>
+                    </div>
                     
-                    <?php if ($settings['show_preferred_date'] === 'yes') : ?>
-                        <div class="cart-quote-field" aria-required="false">
-                            <label for="preferred_date">
-                                <?php esc_html_e('Preferred Start Date', 'cart-quote-woocommerce-email'); ?>
-                                <span class="required">*</span>
-                            </label>
-                            <input type="date" 
-                                   id="preferred_date" 
-                                   name="preferred_date" 
-                                   min="<?php echo esc_attr(date('Y-m-d')); ?>"
-                                   aria-required="true"
-                                   aria-describedby="preferred_date_error">
-                            <span id="preferred_date_error" class="sr-only"></span>
-                        </div>
-                    <?php endif; ?>
+                    <div class="cart-quote-fields-row">
+                        <?php if ($settings['show_preferred_date'] === 'yes') : ?>
+                            <div class="cart-quote-field cart-quote-field-half" aria-required="false">
+                                <label for="preferred_date">
+                                    <?php esc_html_e('Preferred Start Date', 'cart-quote-woocommerce-email'); ?>
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="date" 
+                                       id="preferred_date" 
+                                       name="preferred_date" 
+                                       min="<?php echo esc_attr(date('Y-m-d')); ?>"
+                                       aria-required="true"
+                                       aria-describedby="preferred_date_error">
+                                <span id="preferred_date_error" class="sr-only"></span>
+                            </div>
+                        <?php endif; ?>
 
-                    <div class="cart-quote-field" aria-required="false">
-                        <label for="preferred_time">
-                            <?php esc_html_e('Preferred Meeting Time', 'cart-quote-woocommerce-email'); ?>
-                        </label>
-                        <select id="preferred_time" name="preferred_time" 
-                                aria-required="true"
-                                aria-describedby="preferred_time_error">
-                            <option value=""><?php esc_html_e('Select a time slot', 'cart-quote-woocommerce-email'); ?></option>
-                            <?php foreach ($time_slots as $slot) : ?>
-                                <option value="<?php echo esc_attr($slot); ?>">
-                                    <?php echo esc_html(date_i18n(get_option('time_format'), strtotime($slot))); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <span id="preferred_time_error" class="sr-only"></span>
+                        <div class="cart-quote-field cart-quote-field-half" aria-required="false">
+                            <label for="preferred_time">
+                                <?php esc_html_e('Preferred Meeting Time', 'cart-quote-woocommerce-email'); ?>
+                            </label>
+                            <select id="preferred_time" name="preferred_time" 
+                                    aria-required="true"
+                                    aria-describedby="preferred_time_error">
+                                <option value=""><?php esc_html_e('Select a time slot', 'cart-quote-woocommerce-email'); ?></option>
+                                <?php foreach ($time_slots as $slot) : ?>
+                                    <option value="<?php echo esc_attr($slot); ?>">
+                                        <?php echo esc_html(date_i18n(get_option('time_format'), strtotime($slot))); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <span id="preferred_time_error" class="sr-only"></span>
+                        </div>
                     </div>
                 </div>
 
