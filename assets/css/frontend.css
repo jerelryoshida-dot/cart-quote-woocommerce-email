@@ -653,6 +653,48 @@
     border-radius: 2px;
 }
 
+/* Meeting Header - Full Width */
+.cart-quote-meeting-header {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* Two-Column Row for Date/Time Fields */
+.cart-quote-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 0;
+}
+
+/* Half-Width Fields */
+.cart-quote-field-half {
+    margin-bottom: 0;
+}
+
+/* Responsive: Stack on Tablets and Mobile */
+@media (max-width: 768px) {
+    .cart-quote-fields-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .cart-quote-field-half {
+        width: 100%;
+    }
+}
+
+/* Mobile Optimization */
+@media (max-width: 480px) {
+    .cart-quote-meeting-fields {
+        padding: 15px;
+    }
+    
+    .cart-quote-meeting-header h4 {
+        font-size: 15px;
+    }
+}
+
 /* Checkbox Styling Enhancements */
 .cart-quote-field-checkbox {
     padding: 15px 0;
