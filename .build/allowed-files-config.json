@@ -1,0 +1,28 @@
+{
+  "description": "Plugin files allowed on GitHub - development files stay local",
+  "version": "1.0.0",
+  "allowed_patterns": [
+    "^cart-quote-woocommerce-email\\.php$",
+    "^README\\.md$",
+    "^readme\\.txt$",
+    "^uninstall\\.php$",
+    "^src/[A-Za-z]+/[A-Za-z_]+\\.php$",
+    "^assets/(css|js)/[a-z\\-]+\\.(css|js)$",
+    "^assets/images/[a-z\\-]+\\.(png|jpg|jpeg|gif|svg)$",
+    "^templates/(admin|emails|frontend)/[a-z\\-]+\\.php$"
+  ],
+  "blocked_patterns": [
+    "^\\.github/",
+    "^\\.gitignore$",
+    "^\\.others/",
+    "^tests/",
+    "^build-tests\\.sh$",
+    "^\\.build/",
+    ".*\\.zip$",
+    ".*\\.py[co]?$",
+    "DEPLOYMENT.*\\.md$",
+    "RELEASE_WORKFLOW\\.md$",
+    "wiki-temp/",
+    ".*\\.bak$"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "version": "1.0.12-dev",
+  "environment": "development",
+  "exclude_patterns": [
+    ".build/",
+    ".git/",
+    ".github/",
+    ".gitignore",
+    ".DS_Store",
+    "Thumbs.db",
+    "__pycache__/",
+    "*.pyc",
+    "*.pyo",
+    "node_modules/",
+    "vendor/",
+    "*.log",
+    "*.tmp",
+    "*.temp",
+    "test-extract/",
+    "test-validate/",
+    "build-config.dev.json",
+    "build-config.prod.json",
+    "*.zip",
+    "dist/",
+    "output/",
+    "../tests/",
+    "../docs/"
+  ]
+}

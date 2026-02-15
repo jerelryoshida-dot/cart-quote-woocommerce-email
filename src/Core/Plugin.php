@@ -40,7 +40,7 @@ final class Plugin
      *
      * @var string
      */
-    private $version = '1.0.15';
+    private $version = '1.0.17';
 
     /**
      * Get singleton instance
@@ -266,6 +266,7 @@ final class Plugin
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('cart_quote_frontend_nonce'),
             'cartUrl' => $cart_url,
+            'debug' => defined('WP_DEBUG') && WP_DEBUG,
             'i18n' => [
                 'processing' => __('Processing...', 'cart-quote-woocommerce-email'),
                 'success' => __('Quote submitted successfully! We will contact you soon.', 'cart-quote-woocommerce-email'),

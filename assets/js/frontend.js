@@ -49,8 +49,45 @@
                                 var $input = $itemRow.find('.cart-quote-qty-input');
                                 if ($input.length) {
                                     $input.val(item.quantity);
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Update subtotal if present in wrapper
+                    if (response.data.subtotal) {
+                        $wrapper.find('.cart-quote-subtotal-amount').html(response.data.subtotal);
+                    }
+                    
+                    // Update global cart count if present
+                    if (response.data.cart_count !== undefined) {
+                        $('.cart-quote-count').text(response.data.cart_count);
+                    }
+                } else {
+                    // Show error message if available
+                    if (response.data && response.data.message) {
+                        console.error('Cart Quote: ' + response.data.message);
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                // Log error for debugging
+                if (typeof cartQuoteFrontend !== 'undefined' && cartQuoteFrontend.debug) {
+                    console.error('Cart Quote AJAX Error:', {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText
+                    });
+                }
+                
+                // Restore original quantity on error
+                var originalQty = $row.find('.cart-quote-qty-input').data('original-qty');
+                if (originalQty) {
+                    $row.find('.cart-quote-qty-input').val(originalQty);
+                }
+            }
+        });
     }
-}
 
 // Error handling utility functions
 function showError($element, message) {
@@ -106,6 +143,9 @@ function isValidEmail(email) {
             var currentVal = parseInt($input.val()) || 1;
             var newVal = currentVal + 1;
             
+            // Store original quantity for rollback on error
+            $input.data('original-qty', currentVal);
+            
             $input.val(newVal);
             updateCartItemQuantity(cartItemKey, newVal, $row);
         });
@@ -128,6 +168,9 @@ function isValidEmail(email) {
                 newVal = 1;
             }
             
+            // Store original quantity for rollback on error
+            $input.data('original-qty', currentVal);
+            
             $input.val(newVal);
             
             if (newVal !== currentVal) {
@@ -140,12 +183,16 @@ function isValidEmail(email) {
             var $input = $(this);
             var $row = $input.closest('li');
             var cartItemKey = $row.attr('data-cart-item-key');
+            var currentVal = parseInt($input.data('original-qty')) || parseInt($input.val()) || 1;
             var quantity = parseInt($input.val()) || 1;
             
             if (quantity < 1) {
                 quantity = 1;
                 $input.val(1);
             }
+            
+            // Store original quantity for rollback on error
+            $input.data('original-qty', currentVal);
             
             updateCartItemQuantity(cartItemKey, quantity, $row);
         });
