@@ -1,6 +1,6 @@
 # Cart Quote WooCommerce & Email
 
-[![Version](https://img.shields.io/badge/version-1.0.14-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases)
+[![Version](https://img.shields.io/badge/version-1.0.17-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases)
 [![License](https://img.shields.io/badge/license-GPL--2.0-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-8892BF.svg)](https://php.net)
 [![WordPress](https://img.shields.io/badge/WordPress-%3E%3D5.8-21759B.svg)](https://wordpress.org)
@@ -232,6 +232,7 @@ cart-quote-woocommerce-email/
 
 | Version | Date | Changes |
 |---------|------|---------|
+| [1.0.17](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.17) | 2026-02-15 | 🐛 Fixed critical AJAX syntax error in frontend.js: Added 5 missing closing braces to updateCartItemQuantity function, implemented error handling with rollback on failed AJAX requests, added debug flag to wp_localize_script, validated JavaScript syntax (92 opening/92 closing braces - balanced) |
 | [1.0.14](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.14) | 2026-02-15 | 🎨 **Visual & UX Enhancements**: Professional gradient styling for meeting fields, enhanced checkbox with focus states, improved error field highlighting with red borders, smooth slide animations for field visibility toggle, custom dropdown arrows, auto-focus on date field when meeting requested, smooth transitions throughout, professional error messages with specific guidance |
 | [1.0.13](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.13) | 2026-02-15 | 🛠️ **Critical Fix**: Deployment validation system added to prevent missing file errors, ZIP validation script with backslash detection, enhanced build script with auto-validation, WordPress Site Health integration for plugin integrity, comprehensive deployment documentation (DEPLOYMENT.md), unit tests for activation, integration tests for ZIP structure |
 | [1.0.12-dev](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.12-dev) | 2026-02-15 | 🔧 **Build System**: Organized all build infrastructure into .build/ folder (local-only), updated build script for parent directory paths, simplified .gitignore, added output directory for build artifacts |
