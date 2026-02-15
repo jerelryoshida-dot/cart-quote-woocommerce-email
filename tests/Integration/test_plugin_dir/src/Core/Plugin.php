@@ -1,1 +1,0 @@
-<?php declare(strict_types=1); class Plugin { public static function get_instance() { return new self(); } public function init() {} }

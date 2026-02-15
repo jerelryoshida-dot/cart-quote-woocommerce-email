@@ -1,1 +1,0 @@
-<?php function autoload($class) { return true; } spl_autoload_register("autoload");

@@ -1,1 +1,0 @@
-<?php declare(strict_types=1); class Health_Check { public static function check() { return true; } }

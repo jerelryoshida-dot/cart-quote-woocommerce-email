@@ -1,1 +1,0 @@
-<?php declare(strict_types=1); class Validator { public static function validate_critical_files() { return ["valid" => true, "missing" => []]; } public static function validate_and_stop_if_missing() { return true; } }

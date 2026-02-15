@@ -1,1 +1,0 @@
-<?php declare(strict_types=1); class Frontend_Manager { public static function init() {} }

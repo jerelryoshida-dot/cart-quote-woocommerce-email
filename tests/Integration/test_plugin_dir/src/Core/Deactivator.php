@@ -1,1 +1,0 @@
-<?php declare(strict_types=1); class Deactivator { public function deactivate() {} }
