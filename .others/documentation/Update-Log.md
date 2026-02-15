@@ -16,6 +16,43 @@
 
 ## Changelog
 
+### File Organization (February 15, 2026)
+
+**Repository Structure Updates:**
+- Created `.others/` directory for local-only files
+- Moved all documentation to `.others/documentation/`
+- Moved verification scripts to `.others/verification/`
+- Updated `.gitignore` to exclude `.others/` directory
+- Kept README.md in root directory (accessible)
+- Kept all core plugin files in git tracking
+- Created subdirectories for better organization
+
+**Files Moved to `.others/`:**
+- `DEPLOYMENT.md` → `.others/documentation/`
+- `DEPLOYMENT_CHECKLIST.md` → `.others/documentation/`
+- `MEETING_FEATURE_ENHANCEMENT_SUMMARY.md` → `.others/documentation/`
+- `wiki/Update-Log.md` → `.others/documentation/`
+- `verify_enhancements.sh` → `.others/verification/`
+
+**Benefits:**
+- Clean GitHub repository with only essential files
+- Local documentation for easy updates
+- Organized file structure
+- Automated workflow for future file organization
+- README.md remains accessible in root
+
+**Directory Structure:**
+```
+.others/
+├── documentation/          # Project documentation
+├── verification/          # Verification scripts
+├── temporary/             # Temporary files
+├── drafts/                # Draft content
+└── misc/                  # Miscellaneous files
+```
+
+---
+
 ### Version 1.0.14 (February 15, 2026)
 
 **Visual & UX Enhancements:**
