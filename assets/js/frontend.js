@@ -451,7 +451,7 @@ function isValidEmail(email) {
                     .stop(true, true)
                     .slideDown({
                         duration: 300,
-                        easing: 'easeInOutCubic',
+                        easing: 'swing',
                         complete: function() {
                             $dateField.focus();
                             $dateField.addClass('focused-field');
@@ -471,7 +471,7 @@ function isValidEmail(email) {
                     .stop(true, true)
                     .slideUp({
                         duration: 250,
-                        easing: 'easeInCubic',
+                        easing: 'swing',
                         complete: function() {
                             // Remove error states
                             $meetingFields.find('.error').removeClass('error');
