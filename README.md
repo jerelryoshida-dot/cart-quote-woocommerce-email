@@ -1,6 +1,6 @@
 # Cart Quote WooCommerce & Email
 
-[![Version](https://img.shields.io/badge/version-1.0.10-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases)
+[![Version](https://img.shields.io/badge/version-1.0.12--dev-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases)
 [![License](https://img.shields.io/badge/license-GPL--2.0-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-8892BF.svg)](https://php.net)
 [![WordPress](https://img.shields.io/badge/WordPress-%3E%3D5.8-21759B.svg)](https://wordpress.org)
@@ -232,6 +232,7 @@ cart-quote-woocommerce-email/
 
 | Version | Date | Changes |
 |---------|------|---------|
+| [1.0.12-dev](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.12-dev) | 2026-02-15 | 🔧 **Build System**: Organized all build infrastructure into .build/ folder (local-only), updated build script for parent directory paths, simplified .gitignore, added output directory for build artifacts |
 | [1.0.10](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.10) | 2026-02-15 | 🚀 Performance optimizations: caching (40-50% DB reduction), query monitoring (slow query detection), rate limiting (IP-based 5/min), database indexes (60-80% faster), chunked CSV export |
 | [1.0.9](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.9) | 2026-02-15 | Code cleanup & bug fixes: syntax error, checkbox handling, removed unused code, enhanced IP validation, division by zero protection |
 | [1.0.8](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.8) | 2026-02-14 | Bug fixes: version mismatch, duplicate cart clearing, additional_notes field |
@@ -260,6 +261,138 @@ cart-quote-woocommerce-email/
 
 ---
 
+## Build System
+
+### Overview
+
+This plugin uses a local-only build system to create WordPress plugin distribution ZIP files. All build infrastructure is contained in the `.build/` directory and is never committed to the repository.
+
+### Build Directory Structure
+
+```
+.build/                          # LOCAL ONLY (never committed)
+├── .gitignore                  # Build-specific ignore patterns
+├── build-zip.py                # Main build script
+├── build-config.json           # Default configuration template
+├── build-config.local.json     # Local override (your personal settings)
+├── build-config.dev.json       # Development environment config
+├── build-config.prod.json      # Production environment config
+└── output/                    # Build artifacts (*.zip files)
+```
+
+### Building the Plugin
+
+**Prerequisites:**
+- Python 3.x installed
+- Build files located in `.build/` directory
+
+**Build from .build/ directory:**
+```bash
+cd .build
+
+# Build with specific version
+python build-zip.py 1.0.13
+
+# Build with local config (uses version from build-config.local.json)
+python build-zip.py
+
+# Build with production environment
+python build-zip.py 1.0.13 --env prod
+
+# Build with development environment
+python build-zip.py 1.0.13 --env dev
+
+# Build with custom configuration
+python build-zip.py 1.0.13 --config custom-config.json
+```
+
+### Configuration Files
+
+**build-config.json (Template)**
+Default configuration committed to repository as reference. Contains all plugin source paths, exclusion patterns, and build settings.
+
+**build-config.local.json (Local Override)**
+Your personal configuration that overrides template settings. Never committed to Git. Used for custom versions, paths, or build settings.
+
+**build-config.dev.json (Development)**
+Development-specific configuration. May include test files, debug assets, or relaxed validation.
+
+**build-config.prod.json (Production)**
+Production-specific configuration. Strict exclusion patterns, fails if required files missing.
+
+### Configuration Loading Priority
+
+1. `build-config.local.json` (highest priority)
+2. `build-config.{env}.json` (--env dev or prod)
+3. `build-config.json` (default template)
+
+### Build Output
+
+ZIP files are created in `.build/output/`:
+- Development: `cart-quote-woocommerce-email-dev-v{version}.zip`
+- Production: `cart-quote-woocommerce-email-v{version}.zip`
+
+### Example Workflow
+
+```bash
+# 1. Update version in local config
+cd .build
+# Edit build-config.local.json: set "version": "1.0.13"
+
+# 2. Build plugin
+python build-zip.py
+
+# 3. Output created in output/
+# .build/output/cart-quote-woocommerce-email-dev-v1.0.13.zip
+
+# 4. Upload to GitHub release
+gh release create v1.0.13 \
+  --title "v1.0.13" \
+  --notes "Release notes here" \
+  .build/output/cart-quote-woocommerce-email-v1.0.13.zip
+```
+
+### Build Configuration Example
+
+```json
+{
+  "plugin_name": "cart-quote-woocommerce-email",
+  "version": "1.0.12-dev",
+  "environment": "development",
+  "include_dirs": [
+    "../src/",
+    "../templates/",
+    "../assets/"
+  ],
+  "include_files": [
+    "../cart-quote-woocommerce-email.php",
+    "../readme.txt",
+    "../uninstall.php"
+  ],
+  "exclude_patterns": [
+    ".build/",
+    ".git/",
+    ".github/",
+    "*.zip"
+  ],
+  "required_files": [
+    "../cart-quote-woocommerce-email.php",
+    "../readme.txt"
+  ],
+  "fail_on_missing": true,
+  "output_dir": "output/"
+}
+```
+
+### Notes
+
+- **Local-Only**: The entire `.build/` directory is ignored by Git and never committed
+- **No CI/CD**: This project uses manual builds only, no GitHub Actions automation
+- **Clean Repository**: Only plugin source files are committed to the repository
+- **Flexible**: Configure different builds for development, testing, and production
+
+---
+
 ## License
 
 GPL-2.0-or-later. See [GNU General Public License](https://www.gnu.org/licenses/gpl-2.0.html).
@@ -274,6 +407,23 @@ GPL-2.0-or-later. See [GNU General Public License](https://www.gnu.org/licenses/
 ---
 
 ## Changelog
+
+### 1.0.12-dev
+* 🔧 **Build System**:
+  - Organized all build infrastructure into `.build/` directory (local-only)
+  - Updated build-zip.py to handle paths from parent directory
+  - Moved build-config.json, build-zip.py, and all config variants to .build/
+  - Simplified root .gitignore to exclude .build/, .github/, and .gitignore
+  - Created .build/output/ directory for build artifacts
+  - Added build system documentation to README.md
+* 📁 **Repository Organization**:
+  - Clean repository root with only plugin source files
+  - All build infrastructure contained in single .build/ directory
+  - Enhanced maintainability and portability of build system
+* 🔧 **Configuration**:
+  - Updated all config files to use `../` prefix for parent directory paths
+  - Added output_dir configuration option
+  - Improved path resolution for cross-platform compatibility
 
 ### 1.0.10
 * 🚀 **Performance Optimizations**:
