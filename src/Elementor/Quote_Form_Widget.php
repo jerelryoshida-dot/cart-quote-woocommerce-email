@@ -557,6 +557,47 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                     </div>
                 <?php endif; ?>
 
+                <?php if ($settings['show_contract_duration'] === 'yes') : ?>
+                    <div class="cart-quote-field cart-quote-field-wide">
+                        <label for="contract_duration">
+                            <?php esc_html_e('Contract Duration', 'cart-quote-woocommerce-email'); ?>
+                            <span class="required">*</span>
+                        </label>
+                        <select id="contract_duration" name="contract_duration" required class="cart-quote-select">
+                            <option value=""><?php esc_html_e('Select duration', 'cart-quote-woocommerce-email'); ?></option>
+                            <option value="1_month"><?php esc_html_e('1 Month', 'cart-quote-woocommerce-email'); ?></option>
+                            <option value="3_months"><?php esc_html_e('3 Months', 'cart-quote-woocommerce-email'); ?></option>
+                            <option value="6_months"><?php esc_html_e('6 Months', 'cart-quote-woocommerce-email'); ?></option>
+                            <option value="custom"><?php esc_html_e('Custom (please specify)', 'cart-quote-woocommerce-email'); ?></option>
+                        </select>
+                    </div>
+
+                    <div class="cart-quote-field cart-quote-field-wide cart-quote-custom-duration" style="display: none;">
+                        <label for="custom_duration">
+                            <?php esc_html_e('Custom Duration', 'cart-quote-woocommerce-email'); ?>
+                        </label>
+                        <input type="text" 
+                               id="custom_duration" 
+                               name="custom_duration" 
+                               class="cart-quote-input"
+                               placeholder="<?php esc_attr_e('e.g., 2 months, 1 year', 'cart-quote-woocommerce-email'); ?>">
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($settings['show_meeting_toggle'] === 'yes') : ?>
+                    <div class="cart-quote-field cart-quote-field-checkbox" aria-required="false">
+                        <label class="cart-quote-checkbox-label" for="meeting_requested">
+                            <input type="checkbox" 
+                                   name="meeting_requested" 
+                                   id="meeting_requested" 
+                                   value="1"
+                                   aria-required="false">
+                            <span><?php echo esc_html($settings['meeting_checkbox_label']); ?></span>
+                        </label>
+                        <span class="field-hint"><?php esc_html_e('Select this option to schedule a meeting', 'cart-quote-woocommerce-email'); ?></span>
+                    </div>
+                <?php endif; ?>
+
                 <div class="cart-quote-form-row cart-quote-meeting-fields" 
                      style="display: none;" 
                      role="region"
@@ -599,47 +640,6 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                         <span id="preferred_time_error" class="sr-only"></span>
                     </div>
                 </div>
-
-                <?php if ($settings['show_contract_duration'] === 'yes') : ?>
-                    <div class="cart-quote-field cart-quote-field-wide">
-                        <label for="contract_duration">
-                            <?php esc_html_e('Contract Duration', 'cart-quote-woocommerce-email'); ?>
-                            <span class="required">*</span>
-                        </label>
-                        <select id="contract_duration" name="contract_duration" required class="cart-quote-select">
-                            <option value=""><?php esc_html_e('Select duration', 'cart-quote-woocommerce-email'); ?></option>
-                            <option value="1_month"><?php esc_html_e('1 Month', 'cart-quote-woocommerce-email'); ?></option>
-                            <option value="3_months"><?php esc_html_e('3 Months', 'cart-quote-woocommerce-email'); ?></option>
-                            <option value="6_months"><?php esc_html_e('6 Months', 'cart-quote-woocommerce-email'); ?></option>
-                            <option value="custom"><?php esc_html_e('Custom (please specify)', 'cart-quote-woocommerce-email'); ?></option>
-                        </select>
-                    </div>
-
-                    <div class="cart-quote-field cart-quote-field-wide cart-quote-custom-duration" style="display: none;">
-                        <label for="custom_duration">
-                            <?php esc_html_e('Custom Duration', 'cart-quote-woocommerce-email'); ?>
-                        </label>
-                        <input type="text" 
-                               id="custom_duration" 
-                               name="custom_duration" 
-                               class="cart-quote-input"
-                               placeholder="<?php esc_attr_e('e.g., 2 months, 1 year', 'cart-quote-woocommerce-email'); ?>">
-                    </div>
-                <?php endif; ?>
-
-                <?php if ($settings['show_meeting_toggle'] === 'yes') : ?>
-                    <div class="cart-quote-field cart-quote-field-checkbox" aria-required="false">
-                        <label class="cart-quote-checkbox-label" for="meeting_requested">
-                            <input type="checkbox" 
-                                   name="meeting_requested" 
-                                   id="meeting_requested" 
-                                   value="1"
-                                   aria-required="false">
-                            <span><?php echo esc_html($settings['meeting_checkbox_label']); ?></span>
-                        </label>
-                        <span class="field-hint"><?php esc_html_e('Select this option to schedule a meeting', 'cart-quote-woocommerce-email'); ?></span>
-                    </div>
-                <?php endif; ?>
 
                 <?php if ($settings['show_notes'] === 'yes') : ?>
                     <div class="cart-quote-field cart-quote-field-wide">

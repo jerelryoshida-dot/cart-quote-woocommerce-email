@@ -63,6 +63,39 @@ if (!defined('ABSPATH')) {
 
         <h3><?php esc_html_e('Quote Details', 'cart-quote-woocommerce-email'); ?></h3>
 
+        <div class="cart-quote-field">
+            <label for="contract_duration">
+                <?php esc_html_e('Contract Duration', 'cart-quote-woocommerce-email'); ?>
+                <span class="required">*</span>
+            </label>
+            <select id="contract_duration" name="contract_duration" required class="cart-quote-select">
+                <option value=""><?php esc_html_e('Select duration', 'cart-quote-woocommerce-email'); ?></option>
+                <option value="1_month"><?php esc_html_e('1 Month', 'cart-quote-woocommerce-email'); ?></option>
+                <option value="3_months"><?php esc_html_e('3 Months', 'cart-quote-woocommerce-email'); ?></option>
+                <option value="6_months"><?php esc_html_e('6 Months', 'cart-quote-woocommerce-email'); ?></option>
+                <option value="custom"><?php esc_html_e('Custom (please specify)', 'cart-quote-woocommerce-email'); ?></option>
+            </select>
+        </div>
+
+        <div class="cart-quote-field cart-quote-custom-duration" style="display: none;">
+            <label for="custom_duration">
+                <?php esc_html_e('Custom Duration', 'cart-quote-woocommerce-email'); ?>
+            </label>
+            <input type="text" id="custom_duration" name="custom_duration" class="cart-quote-input" placeholder="<?php esc_attr_e('e.g., 2 months, 1 year', 'cart-quote-woocommerce-email'); ?>">
+        </div>
+
+        <div class="cart-quote-field cart-quote-field-checkbox" aria-required="false">
+            <label class="cart-quote-checkbox-label" for="meeting_requested">
+                <input type="checkbox" 
+                       name="meeting_requested" 
+                       id="meeting_requested" 
+                       value="1"
+                       aria-required="false">
+                <span><?php esc_html_e('Request a meeting', 'cart-quote-woocommerce-email'); ?></span>
+            </label>
+            <span class="field-hint"><?php esc_html_e('Select this option to schedule a meeting', 'cart-quote-woocommerce-email'); ?></span>
+        </div>
+
         <div class="cart-quote-form-row cart-quote-meeting-fields" 
              style="display: none;" 
              role="region"
@@ -96,39 +129,6 @@ if (!defined('ABSPATH')) {
                 </select>
                 <span class="sr-only"></span>
             </div>
-        </div>
-
-        <div class="cart-quote-field">
-            <label for="contract_duration">
-                <?php esc_html_e('Contract Duration', 'cart-quote-woocommerce-email'); ?>
-                <span class="required">*</span>
-            </label>
-            <select id="contract_duration" name="contract_duration" required class="cart-quote-select">
-                <option value=""><?php esc_html_e('Select duration', 'cart-quote-woocommerce-email'); ?></option>
-                <option value="1_month"><?php esc_html_e('1 Month', 'cart-quote-woocommerce-email'); ?></option>
-                <option value="3_months"><?php esc_html_e('3 Months', 'cart-quote-woocommerce-email'); ?></option>
-                <option value="6_months"><?php esc_html_e('6 Months', 'cart-quote-woocommerce-email'); ?></option>
-                <option value="custom"><?php esc_html_e('Custom (please specify)', 'cart-quote-woocommerce-email'); ?></option>
-            </select>
-        </div>
-
-        <div class="cart-quote-field cart-quote-custom-duration" style="display: none;">
-            <label for="custom_duration">
-                <?php esc_html_e('Custom Duration', 'cart-quote-woocommerce-email'); ?>
-            </label>
-            <input type="text" id="custom_duration" name="custom_duration" class="cart-quote-input" placeholder="<?php esc_attr_e('e.g., 2 months, 1 year', 'cart-quote-woocommerce-email'); ?>">
-        </div>
-
-        <div class="cart-quote-field cart-quote-field-checkbox" aria-required="false">
-            <label class="cart-quote-checkbox-label" for="meeting_requested">
-                <input type="checkbox" 
-                       name="meeting_requested" 
-                       id="meeting_requested" 
-                       value="1"
-                       aria-required="false">
-                <span><?php esc_html_e('Request a meeting', 'cart-quote-woocommerce-email'); ?></span>
-            </label>
-            <span class="field-hint"><?php esc_html_e('Select this option to schedule a meeting', 'cart-quote-woocommerce-email'); ?></span>
         </div>
 
         <div class="cart-quote-field">
