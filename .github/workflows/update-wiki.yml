@@ -21,7 +21,6 @@ jobs:
           TAG="${{ github.event.release.tag_name }}"
           BODY="${{ github.event.release.body }}"
 
-          # Parse release notes to extract changes
           # Extract version from tag (remove 'v' prefix)
           VERSION=${TAG#v}
           RELEASE_DATE=$(date +%Y-%m-%d)
@@ -39,32 +38,24 @@ jobs:
             exit 1
           fi
 
-          # Create new entry at the top of Release History section
-          # Find the line with "## Release History" and insert after it
-          # Add new release entry
-
-          # Use sed to insert the new release entry after the "## Release History" header
+          # Create temporary file
           TEMP_FILE=$(mktemp)
 
-          # Add new release entry before existing v1.0.9 entry
-          awk '
-          /## Release History/ { print; print ""; }
-          /## Version Details/ { exit }
-          !/^$/ { print }
-          ' Update-Log.md > "$TEMP_FILE"
+          # Copy content up to and including "## Release History" header
+          sed '/^## Release History/,$!d' Update-Log.md > "$TEMP_FILE"
 
-          # Add new release entry
-          cat >> "$TEMP_FILE" << EOF
+          # Parse release notes to extract summary (first bullet point or first non-empty line)
+          SUMMARY=$(echo "$BODY" | grep -E '^\-|^•' | head -1 | sed 's/^[-•]\s*//')
 
-          [v$VERSION](https://github.com/${{ github.repository }}/releases/tag/$TAG)
-          $RELEASE_DATE
+          # Create table row (match wiki table format)
+          echo "" >> "$TEMP_FILE"
+          echo "| [v$VERSION](https://github.com/${{ github.repository }}/releases/tag/$TAG) | $RELEASE_DATE | $SUMMARY |" >> "$TEMP_FILE"
 
-          $BODY
+          # Add table separator
+          echo "|---------|------|---------|" >> "$TEMP_FILE"
 
-          EOF
-
-          # Append the rest of the file (from Version Details section onwards)
-          sed -n '/## Version Details/,$p' Update-Log.md >> "$TEMP_FILE"
+          # Add existing table rows (skip headers, empty lines, and separator)
+          tail -n +5 Update-Log.md >> "$TEMP_FILE"
 
           # Replace the original file
           mv "$TEMP_FILE" Update-Log.md
@@ -74,4 +65,4 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Update-Log.md
           git commit -m "Update wiki for release $TAG"
-          git push origin main
+          git push origin master
