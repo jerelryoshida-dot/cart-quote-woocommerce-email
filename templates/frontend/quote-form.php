@@ -96,7 +96,7 @@ if (!defined('ABSPATH')) {
             <span class="field-hint"><?php esc_html_e('Select this option to schedule a meeting', 'cart-quote-woocommerce-email'); ?></span>
         </div>
 
-        <div class="cart-quote-form-row cart-quote-meeting-fields" 
+        <div class="cart-quote-meeting-fields" 
              style="display: none;" 
              role="region"
              aria-labelledby="meeting_requested_label">
