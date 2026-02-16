@@ -15,8 +15,12 @@
          * Initialize
          */
         init: function() {
+            console.log('[CartQuote] Initializing admin JS...');
             this.bindEvents();
+            console.log('[CartQuote] Events bound successfully');
             this.initDatepicker();
+            console.log('[CartQuote] Datepicker initialized');
+            console.log('[CartQuote] Init complete');
         },
 
         /**
@@ -204,15 +208,21 @@
          */
         saveNotes: function(e) {
             e.preventDefault();
+            console.log('[CartQuote] saveNotes triggered');
+            console.log('[CartQuote] Button data-quote-id:', $(this).data('quote-id'));
+            console.log('[CartQuote] Notes value:', $('#admin_notes').val());
+            console.log('[CartQuote] cartQuoteAdmin object:', cartQuoteAdmin);
 
             var $btn = $(this);
             var quoteId = $btn.data('quote-id');
             var notes = $('#admin_notes').val();
 
             if (!confirm(cartQuoteAdmin.i18n.confirmSaveNotes)) {
+                console.log('[CartQuote] Confirmation cancelled');
                 return;
             }
 
+            console.log('[CartQuote] Sending AJAX request...');
             $btn.prop('disabled', true).text(cartQuoteAdmin.i18n.saving);
 
             $.ajax({
@@ -225,13 +235,15 @@
                     notes: notes
                 },
                 success: function(response) {
+                    console.log('[CartQuote] saveNotes AJAX response:', response);
                     if (response.success) {
                         CartQuoteAdmin.showToast(response.data.message, 'success');
                     } else {
                         CartQuoteAdmin.showToast(response.data.message, 'error');
                     }
                 },
-                error: function() {
+                error: function(xhr, status, error) {
+                    console.error('[CartQuote] saveNotes AJAX error:', xhr, status, error);
                     CartQuoteAdmin.showToast(cartQuoteAdmin.i18n.error, 'error');
                 },
                 complete: function() {
