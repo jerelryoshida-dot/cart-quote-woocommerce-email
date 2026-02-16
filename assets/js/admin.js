@@ -17,7 +17,6 @@
         init: function() {
             this.bindEvents();
             this.initDatepicker();
-            this.initTooltips();
         },
 
         /**
@@ -75,13 +74,6 @@
                 changeMonth: true,
                 changeYear: true
             });
-        },
-
-        /**
-         * Initialize tooltips
-         */
-        initTooltips: function() {
-            $('.cart-quote-tooltip').tooltip();
         },
 
         /**
