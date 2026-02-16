@@ -282,6 +282,9 @@
                 success: function(response) {
                     if (response.success) {
                         CartQuoteAdmin.showToast(response.data.message, 'success');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
                     } else {
                         CartQuoteAdmin.showToast(response.data.message, 'error');
                     }
