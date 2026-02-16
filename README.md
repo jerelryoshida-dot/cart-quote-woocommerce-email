@@ -1,6 +1,6 @@
 # Cart Quote WooCommerce & Email
 
-[![Version](https://img.shields.io/badge/version-1.0.23-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases)
+[![Version](https://img.shields.io/badge/version-1.0.25-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases)
 [![License](https://img.shields.io/badge/license-GPL--2.0-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-8892BF.svg)](https://php.net)
 [![WordPress](https://img.shields.io/badge/WordPress-%3E%3D5.8-21759B.svg)](https://wordpress.org)
@@ -231,8 +231,10 @@ cart-quote-woocommerce-email/
 ## Releases
 
 | Version | Date | Changes |
-- [v1.0.23](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.23) | 2026-02-15 | 🛠️ **fix**: CRITICAL FIX: Build system path normalization and structure improvements |
 |---------|------|---------|
+| [v1.0.25](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.25) | 2026-02-16 | 🔒 **Security & Bug Fixes**: IP spoofing vulnerability fix, rate limiting fix, SQL injection prevention, missing returns after wp_send_json_error, PHP 8.1+ deprecation warning fix, input length validation, redundant JS debug check removal |
+| [v1.0.24](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.24) | 2026-02-15 | 🐛 **Bug Fix**: Minor fixes and cleanup |
+| [v1.0.23](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.23) | 2026-02-15 | 🛠️ **fix**: CRITICAL FIX: Build system path normalization and structure improvements |
 | [1.0.17](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.17) | 2026-02-15 | 🐛 Fixed critical AJAX syntax error in frontend.js: Added 5 missing closing braces to updateCartItemQuantity function, implemented error handling with rollback on failed AJAX requests, added debug flag to wp_localize_script, validated JavaScript syntax (92 opening/92 closing braces - balanced) |
 | [1.0.14](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.14) | 2026-02-15 | 🎨 **Visual & UX Enhancements**: Professional gradient styling for meeting fields, enhanced checkbox with focus states, improved error field highlighting with red borders, smooth slide animations for field visibility toggle, custom dropdown arrows, auto-focus on date field when meeting requested, smooth transitions throughout, professional error messages with specific guidance |
 | [1.0.13](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email/releases/tag/v1.0.13) | 2026-02-15 | 🛠️ **Critical Fix**: Deployment validation system added to prevent missing file errors, ZIP validation script with backslash detection, enhanced build script with auto-validation, WordPress Site Health integration for plugin integrity, comprehensive deployment documentation (DEPLOYMENT.md), unit tests for activation, integration tests for ZIP structure |
@@ -411,6 +413,21 @@ GPL-2.0-or-later. See [GNU General Public License](https://www.gnu.org/licenses/
 ---
 
 ## Changelog
+
+### 1.0.25
+* 🔒 **Security Fixes**:
+  - Fixed IP spoofing vulnerability - removed trust in HTTP_CLIENT_IP and HTTP_X_FORWARDED_FOR headers
+  - Rate limiting now functional - added increment_attempts() call and init() on plugin load
+  - SQL injection prevention - added whitelist validation for orderby columns in Quote_Repository.php
+* 🐛 **Bug Fixes**:
+  - Added missing returns after wp_send_json_error() calls in Admin_Manager.php
+  - Fixed PHP 8.1+ deprecation warning for NULL admin_notes in quote-detail.php template
+  - Added input length validation to prevent database bloat in Checkout_Replacement.php
+  - Fixed redundant JS debug check in frontend.js
+
+### 1.0.24
+* 🐛 **Bug Fixes**:
+  - Minor fixes and cleanup for stability
 
 ### 1.0.12-dev
 * 🔧 **Build System**:
