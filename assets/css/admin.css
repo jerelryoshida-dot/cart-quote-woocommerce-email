@@ -69,10 +69,6 @@
     color: #0073aa;
 }
 
-.cart-quote-stat-card.stat-canceled .stat-number {
-    color: #dc3232;
-}
-
 /* Quotes Table */
 .cart-quote-list-table {
     background: #fff;
@@ -104,36 +100,6 @@
 
 .cart-quote-list-table tr:last-child td {
     border-bottom: none;
-}
-
-/* Status Badges */
-.cart-quote-status {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: capitalize;
-}
-
-.cart-quote-status.status-pending {
-    background: #fff8e5;
-    color: #b45900;
-}
-
-.cart-quote-status.status-contacted {
-    background: #ecf7ed;
-    color: #2e7d32;
-}
-
-.cart-quote-status.status-closed {
-    background: #e5f3ff;
-    color: #0073aa;
-}
-
-.cart-quote-status.status-canceled {
-    background: #fce4e4;
-    color: #c62828;
 }
 
 /* Quote Actions */
@@ -360,7 +326,7 @@
     border-radius: 3px;
 }
 
-.cart-quote-time-slot .remove-slot {
+.cart-quote-time-slot .cart-quote-remove-slot {
     color: #dc3232;
     cursor: pointer;
 }
@@ -410,12 +376,6 @@
 
 .cart-quote-modal-body {
     padding: 20px;
-}
-
-.cart-quote-modal-footer {
-    padding: 15px 20px;
-    border-top: 1px solid #ccd0d4;
-    text-align: right;
 }
 
 /* Toast Notifications */
