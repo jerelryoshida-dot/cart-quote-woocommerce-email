@@ -317,6 +317,7 @@ class Admin_Manager
 
             if (!$id || !$status) {
                 wp_send_json_error(['message' => __('Invalid parameters.', 'cart-quote-woocommerce-email')]);
+                return;
             }
 
             $valid_statuses = ['pending', 'contacted', 'closed', 'canceled'];
@@ -326,6 +327,7 @@ class Admin_Manager
                     'status' => $status,
                 ]);
                 wp_send_json_error(['message' => __('Invalid status.', 'cart-quote-woocommerce-email')]);
+                return;
             }
 
             $result = $this->repository->update_status($id, $status);
@@ -378,6 +380,7 @@ class Admin_Manager
 
             if (!$id) {
                 wp_send_json_error(['message' => __('Invalid quote ID.', 'cart-quote-woocommerce-email')]);
+                return;
             }
 
             $result = $this->repository->update($id, ['admin_notes' => $notes]);
@@ -422,6 +425,7 @@ class Admin_Manager
             if ($csv === false) {
                 $this->logger->error('CSV export failed: repository error');
                 wp_send_json_error(['message' => __('Failed to generate CSV.', 'cart-quote-woocommerce-email')]);
+                return;
             }
 
             $filename = 'quotes-' . date('Y-m-d-His') . '.csv';

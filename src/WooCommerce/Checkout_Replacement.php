@@ -330,6 +330,8 @@ class Checkout_Replacement
                 return;
             }
 
+            \CartQuoteWooCommerce\Core\Rate_Limiter::increment_attempts($ip);
+
             $form_data = $this->sanitize_form_data($_POST);
 
             $validation = $this->validate_form_data($form_data);
@@ -403,29 +405,30 @@ class Checkout_Replacement
 
     private function get_client_ip()
     {
-        $ip = '';
+        $detected_ip = '';
 
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        $trusted_proxies = apply_filters('cart_quote_trusted_proxies', []);
+        $is_trusted_proxy = !empty($trusted_proxies) && in_array($_SERVER['REMOTE_ADDR'] ?? '', $trusted_proxies, true);
+
+        if ($is_trusted_proxy && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $forwarded = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            if (strpos($forwarded, ',') !== false) {
+                $ips = array_map('trim', explode(',', $forwarded));
+                $detected_ip = $ips[0];
+            } else {
+                $detected_ip = $forwarded;
+            }
         } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
-            $ip = $_SERVER['REMOTE_ADDR'];
+            $detected_ip = $_SERVER['REMOTE_ADDR'];
         }
 
-        if (empty($ip)) {
+        if (empty($detected_ip)) {
             return 'unknown';
         }
 
-        $ip = filter_var($ip, FILTER_VALIDATE_IP) ? $ip : 'unknown';
+        $detected_ip = filter_var($detected_ip, FILTER_VALIDATE_IP) ? $detected_ip : 'unknown';
 
-        if (strpos($ip, ',') !== false) {
-            $ips = explode(',', $ip);
-            $ip = trim($ips[0]);
-            $ip = filter_var($ip, FILTER_VALIDATE_IP) ? $ip : 'unknown';
-        }
-
-        return $ip;
+        return $detected_ip;
     }
 
     /**
@@ -473,24 +476,52 @@ class Checkout_Replacement
     {
         $errors = new \WP_Error();
 
+        $max_lengths = [
+            'billing_first_name' => 100,
+            'billing_last_name' => 100,
+            'billing_email' => 255,
+            'billing_phone' => 50,
+            'billing_company' => 255,
+            'contract_duration_final' => 100,
+            'additional_notes' => 5000,
+        ];
+
         if (empty($data['billing_first_name'])) {
             $errors->add('required', __('First name is required.', 'cart-quote-woocommerce-email'));
+        } elseif (mb_strlen($data['billing_first_name']) > $max_lengths['billing_first_name']) {
+            $errors->add('length', __('First name is too long.', 'cart-quote-woocommerce-email'));
         }
 
         if (empty($data['billing_last_name'])) {
             $errors->add('required', __('Last name is required.', 'cart-quote-woocommerce-email'));
+        } elseif (mb_strlen($data['billing_last_name']) > $max_lengths['billing_last_name']) {
+            $errors->add('length', __('Last name is too long.', 'cart-quote-woocommerce-email'));
         }
 
         if (empty($data['billing_email']) || !is_email($data['billing_email'])) {
             $errors->add('required', __('Valid email is required.', 'cart-quote-woocommerce-email'));
+        } elseif (mb_strlen($data['billing_email']) > $max_lengths['billing_email']) {
+            $errors->add('length', __('Email is too long.', 'cart-quote-woocommerce-email'));
         }
 
         if (empty($data['billing_phone'])) {
             $errors->add('required', __('Phone number is required.', 'cart-quote-woocommerce-email'));
+        } elseif (mb_strlen($data['billing_phone']) > $max_lengths['billing_phone']) {
+            $errors->add('length', __('Phone number is too long.', 'cart-quote-woocommerce-email'));
         }
 
         if (empty($data['billing_company'])) {
             $errors->add('required', __('Company name is required.', 'cart-quote-woocommerce-email'));
+        } elseif (mb_strlen($data['billing_company']) > $max_lengths['billing_company']) {
+            $errors->add('length', __('Company name is too long.', 'cart-quote-woocommerce-email'));
+        }
+
+        if (!empty($data['additional_notes']) && mb_strlen($data['additional_notes']) > $max_lengths['additional_notes']) {
+            $errors->add('length', __('Additional notes are too long (max 5000 characters).', 'cart-quote-woocommerce-email'));
+        }
+
+        if (!empty($data['contract_duration_final']) && mb_strlen($data['contract_duration_final']) > $max_lengths['contract_duration_final']) {
+            $errors->add('length', __('Custom contract duration is too long.', 'cart-quote-woocommerce-email'));
         }
 
         if ($data['meeting_requested']) {

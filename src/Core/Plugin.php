@@ -40,7 +40,7 @@ final class Plugin
      *
      * @var string
      */
-    private $version = '1.0.23';
+    private $version = '1.0.25';
 
     /**
      * Get singleton instance
@@ -87,8 +87,12 @@ final class Plugin
      */
     private function register_services()
     {
+        $rate_limiter = \CartQuoteWooCommerce\Core\Rate_Limiter::get_instance();
+        $rate_limiter->init();
+
         $this->services = [
             'logger' => Debug_Logger::get_instance(),
+            'rate_limiter' => $rate_limiter,
             'settings' => new \CartQuoteWooCommerce\Admin\Settings(),
             'repository' => new \CartQuoteWooCommerce\Database\Quote_Repository(),
             'google_calendar' => new \CartQuoteWooCommerce\Google\Google_Calendar_Service(),

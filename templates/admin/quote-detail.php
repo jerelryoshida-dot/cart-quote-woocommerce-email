@@ -179,7 +179,7 @@ if (!defined('ABSPATH')) {
             <div class="cart-quote-detail-card">
                 <h3><?php esc_html_e('Admin Notes', 'cart-quote-woocommerce-email'); ?></h3>
                 <div class="card-content cart-quote-admin-notes">
-                    <textarea id="admin_notes" rows="6"><?php echo esc_textarea($quote->admin_notes); ?></textarea>
+                    <textarea id="admin_notes" rows="6"><?php echo esc_textarea($quote->admin_notes ?? ''); ?></textarea>
                     <button type="button" class="button cart-quote-save-notes" data-quote-id="<?php echo esc_attr($quote->id); ?>">
                         <?php esc_html_e('Save Notes', 'cart-quote-woocommerce-email'); ?>
                     </button>

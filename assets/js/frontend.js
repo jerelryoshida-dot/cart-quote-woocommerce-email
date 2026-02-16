@@ -21,9 +21,7 @@
         }
 
         if (typeof cartQuoteFrontend === 'undefined') {
-            if (typeof cartQuoteFrontend !== 'undefined' && cartQuoteFrontend.debug) {
-                console.log('Cart Quote: cartQuoteFrontend not defined');
-            }
+            console.log('Cart Quote: cartQuoteFrontend not defined');
             return;
         }
 

@@ -206,6 +206,7 @@ class Quote_Repository
 
             if ($quote) {
                 $quote->cart_data = json_decode($quote->cart_data, true);
+                $quote->admin_notes = $quote->admin_notes ?? '';
             } else {
                 $this->logger->warning('Quote not found', [
                     'table' => $this->table_name,
@@ -241,6 +242,7 @@ class Quote_Repository
 
         if ($quote) {
             $quote->cart_data = json_decode($quote->cart_data, true);
+            $quote->admin_notes = $quote->admin_notes ?? '';
         }
 
         return $quote;
@@ -293,7 +295,7 @@ class Quote_Repository
         }
 
         $where_clause = implode(' AND ', $where);
-        $orderby = sanitize_sql_orderby($args['orderby'] . ' ' . $args['order']) ?? 'created_at DESC';
+        $orderby = $this->validate_orderby($args['orderby'], $args['order']);
         $offset = ($args['page'] - 1) * $args['per_page'];
 
         // Build query
@@ -575,5 +577,27 @@ class Quote_Repository
         }
 
         return $output;
+    }
+
+    private function validate_orderby(string $orderby, string $order): string
+    {
+        $allowed_columns = [
+            'id' => 'id',
+            'quote_id' => 'quote_id',
+            'customer_name' => 'customer_name',
+            'email' => 'email',
+            'company_name' => 'company_name',
+            'status' => 'status',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+            'subtotal' => 'subtotal',
+        ];
+
+        $allowed_order = ['ASC', 'DESC'];
+
+        $column = $allowed_columns[$orderby] ?? 'created_at';
+        $direction = in_array(strtoupper($order), $allowed_order, true) ? strtoupper($order) : 'DESC';
+
+        return "{$column} {$direction}";
     }
 }

@@ -196,10 +196,17 @@ class Rate_Limiter
     {
         $detected_ip = '';
 
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            $detected_ip = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $detected_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        $trusted_proxies = apply_filters('cart_quote_trusted_proxies', []);
+        $is_trusted_proxy = !empty($trusted_proxies) && in_array($_SERVER['REMOTE_ADDR'] ?? '', $trusted_proxies, true);
+
+        if ($is_trusted_proxy && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $forwarded = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            if (strpos($forwarded, ',') !== false) {
+                $ips = array_map('trim', explode(',', $forwarded));
+                $detected_ip = $ips[0];
+            } else {
+                $detected_ip = $forwarded;
+            }
         } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
             $detected_ip = $_SERVER['REMOTE_ADDR'];
         }
@@ -209,12 +216,6 @@ class Rate_Limiter
         }
 
         $detected_ip = filter_var($detected_ip, FILTER_VALIDATE_IP) ? $detected_ip : 'unknown';
-
-        if (strpos($detected_ip, ',') !== false) {
-            $ips = explode(',', $detected_ip);
-            $detected_ip = trim($ips[0]);
-            $detected_ip = filter_var($detected_ip, FILTER_VALIDATE_IP) ? $detected_ip : 'unknown';
-        }
 
         return $detected_ip;
     }
