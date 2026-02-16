@@ -415,6 +415,8 @@ GPL-2.0-or-later. See [GNU General Public License](https://www.gnu.org/licenses/
 
 ## Changelog
 
+###
+
 ### 1.0.27
 * ✨ **New Features**:
   - Admin notes now shows confirmation popup before saving on quote detail page
