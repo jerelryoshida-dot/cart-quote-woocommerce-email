@@ -212,7 +212,7 @@ final class Plugin
                 CART_QUOTE_WC_PLUGIN_URL . 'assets/js/admin.js',
                 ['jquery', 'jquery-ui-datepicker'],
                 $this->version,
-                true
+                false
             );
         }
 
