@@ -132,6 +132,54 @@ if (!defined('ABSPATH')) {
                 </div>
             </div>
 
+            <!-- Meeting Editor -->
+            <?php if ($quote->meeting_requested) : ?>
+            <div class="cart-quote-detail-card cart-quote-meeting-editor">
+                <h3><?php esc_html_e('Meeting Editor', 'cart-quote-woocommerce-email'); ?></h3>
+                <div class="card-content">
+                    <div class="meeting-editor-fields">
+                        <div class="meeting-field">
+                            <label for="meeting_date"><?php esc_html_e('Meeting Date:', 'cart-quote-woocommerce-email'); ?></label>
+                            <input type="date" id="meeting_date" value="<?php echo esc_attr($quote->preferred_date ?? ''); ?>" class="regular-text">
+                        </div>
+                        <div class="meeting-field">
+                            <label for="meeting_time"><?php esc_html_e('Meeting Time:', 'cart-quote-woocommerce-email'); ?></label>
+                            <select id="meeting_time" class="regular-text">
+                                <option value=""><?php esc_html_e('-- Select Time --', 'cart-quote-woocommerce-email'); ?></option>
+                                <?php 
+                                $time_slots = \CartQuoteWooCommerce\Admin\Settings::get_time_slots();
+                                foreach ($time_slots as $slot) : 
+                                ?>
+                                    <option value="<?php echo esc_attr($slot); ?>" <?php selected($quote->preferred_time ?? '', $slot); ?>>
+                                        <?php echo esc_html($slot); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="meeting-field">
+                            <button type="button" class="button cart-quote-update-meeting" data-quote-id="<?php echo esc_attr($quote->id); ?>">
+                                <?php esc_html_e('Update Meeting', 'cart-quote-woocommerce-email'); ?>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <?php if (\CartQuoteWooCommerce\Admin\Settings::is_google_connected() && \CartQuoteWooCommerce\Admin\Settings::is_google_meet_enabled()) : ?>
+                    <div class="meeting-google-actions">
+                        <?php if (!$quote->calendar_synced) : ?>
+                            <button type="button" class="button button-primary cart-quote-create-meet" data-quote-id="<?php echo esc_attr($quote->id); ?>">
+                                <span class="dashicons dashicons-video-alt2" style="margin-top: 3px; margin-right: 5px;"></span>
+                                <?php esc_html_e('Create Google Meet', 'cart-quote-woocommerce-email'); ?>
+                            </button>
+                        <?php else : ?>
+                            <span class="dashicons dashicons-yes" style="color: #46b450;"></span>
+                            <?php esc_html_e('Google Calendar Event Created', 'cart-quote-woocommerce-email'); ?>
+                        <?php endif; ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- Cart Items -->
             <div class="cart-quote-detail-card">
                 <h3><?php esc_html_e('Products / Services', 'cart-quote-woocommerce-email'); ?></h3>

@@ -209,6 +209,16 @@ class Settings
     }
 
     /**
+     * Is Google Meet enabled?
+     *
+     * @return bool
+     */
+    public static function is_google_meet_enabled(): bool
+    {
+        return (bool) get_option('cart_quote_wc_enable_google_meet', false);
+    }
+
+    /**
      * Encrypt sensitive data
      *
      * @param string $data Data to encrypt

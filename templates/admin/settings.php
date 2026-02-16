@@ -154,6 +154,16 @@ if (!defined('ABSPATH')) {
                             </label>
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Google Meet', 'cart-quote-woocommerce-email'); ?></th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="enable_google_meet" value="1" <?php checked(get_option('cart_quote_wc_enable_google_meet', false)); ?>>
+                                <?php esc_html_e('Enable Google Meet link creation for calendar events', 'cart-quote-woocommerce-email'); ?>
+                            </label>
+                            <p class="description"><?php esc_html_e('When enabled, a "Create Google Meet" button will appear on quote detail pages with meeting requests.', 'cart-quote-woocommerce-email'); ?></p>
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>

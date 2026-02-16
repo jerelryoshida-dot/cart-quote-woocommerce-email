@@ -415,6 +415,154 @@ class Google_Calendar_Service
     }
 
     /**
+     * Handle create Google Meet AJAX
+     */
+    public function handle_create_meet()
+    {
+        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+
+        if (!$id) {
+            wp_send_json_error(['message' => __('Invalid quote ID.', 'cart-quote-woocommerce-email')]);
+            return;
+        }
+
+        $quote = $this->repository->find($id);
+
+        if (!$quote) {
+            wp_send_json_error(['message' => __('Quote not found.', 'cart-quote-woocommerce-email')]);
+            return;
+        }
+
+        if (!$this->is_connected()) {
+            wp_send_json_error(['message' => __('Google Calendar is not connected.', 'cart-quote-woocommerce-email')]);
+            return;
+        }
+
+        if (!\CartQuoteWooCommerce\Admin\Settings::is_google_meet_enabled()) {
+            wp_send_json_error(['message' => __('Google Meet is not enabled in settings.', 'cart-quote-woocommerce-email')]);
+            return;
+        }
+
+        if ($quote->calendar_synced) {
+            wp_send_json_error(['message' => __('Event already exists for this quote.', 'cart-quote-woocommerce-email')]);
+            return;
+        }
+
+        $event = $this->create_event_with_meet($quote);
+
+        if ($event) {
+            $meet_link = '';
+            if (isset($event['conferenceData']['entryPoints'][0]['uri'])) {
+                $meet_link = $event['conferenceData']['entryPoints'][0]['uri'];
+            } elseif (isset($event['hangoutLink'])) {
+                $meet_link = $event['hangoutLink'];
+            }
+
+            wp_send_json_success([
+                'message' => __('Google Meet created successfully!', 'cart-quote-woocommerce-email'),
+                'event_id' => $event['id'],
+                'event_link' => isset($event['htmlLink']) ? $event['htmlLink'] : '',
+                'meet_link' => $meet_link,
+            ]);
+        } else {
+            wp_send_json_error(['message' => __('Failed to create Google Meet.', 'cart-quote-woocommerce-email')]);
+        }
+    }
+
+    /**
+     * Create a calendar event with Google Meet
+     */
+    public function create_event_with_meet($quote)
+    {
+        if (!$this->is_connected()) {
+            $this->logger->warning('Cannot create Google Meet: not connected');
+            return false;
+        }
+
+        $calendar_id = \CartQuoteWooCommerce\Admin\Settings::get_google_calendar_id();
+        $duration = \CartQuoteWooCommerce\Admin\Settings::get_meeting_duration();
+
+        $date = isset($quote->preferred_date) ? $quote->preferred_date : date('Y-m-d');
+        $time = isset($quote->preferred_time) ? $quote->preferred_time : '09:00';
+
+        try {
+            $start_datetime = new \DateTime($date . ' ' . $time, new \DateTimeZone(wp_timezone_string()));
+            $end_datetime = clone $start_datetime;
+            $end_datetime->add(new \DateInterval('PT' . $duration . 'M'));
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to create DateTime for Google Meet', [
+                'quote_id' => $quote->quote_id ?? 'unknown',
+                'date' => $date,
+                'time' => $time,
+                'exception' => $e->getMessage(),
+            ]);
+            return false;
+        }
+
+        $event_data = [
+            'summary' => sprintf(
+                'Quote Meeting: %s (%s)',
+                $quote->customer_name,
+                $quote->quote_id
+            ),
+            'description' => $this->build_event_description($quote),
+            'start' => [
+                'dateTime' => $start_datetime->format('c'),
+                'timeZone' => wp_timezone_string(),
+            ],
+            'end' => [
+                'dateTime' => $end_datetime->format('c'),
+                'timeZone' => wp_timezone_string(),
+            ],
+            'status' => 'tentative',
+            'attendees' => [
+                [
+                    'email' => $quote->email,
+                    'displayName' => $quote->customer_name,
+                ],
+            ],
+            'conferenceData' => [
+                'createRequest' => [
+                    'requestId' => 'quote-' . $quote->quote_id . '-' . time(),
+                    'conferenceSolutionKey' => [
+                        'type' => 'hangoutsMeet',
+                    ],
+                ],
+            ],
+        ];
+
+        $response = $this->api_request(
+            '/calendars/' . urlencode($calendar_id) . '/events?conferenceDataVersion=1',
+            'POST',
+            $event_data
+        );
+
+        if ($response && isset($response['id'])) {
+            $this->repository->save_google_event($quote->id, $response['id']);
+            
+            $this->repository->log(
+                $quote->quote_id,
+                'google_meet_created',
+                'Google Meet created: ' . $response['id'],
+                get_current_user_id()
+            );
+
+            $this->logger->info('Google Meet created', [
+                'quote_id' => $quote->quote_id,
+                'event_id' => $response['id'],
+            ]);
+
+            return $response;
+        }
+
+        $this->logger->error('Failed to create Google Meet', [
+            'quote_id' => $quote->quote_id ?? 'unknown',
+        ]);
+
+        return false;
+    }
+
+    /**
      * Handle OAuth callback
      */
     public function handle_oauth_callback()

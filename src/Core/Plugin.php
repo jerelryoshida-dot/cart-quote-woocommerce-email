@@ -40,7 +40,7 @@ final class Plugin
      *
      * @var string
      */
-    private $version = '1.0.26';
+    private $version = '1.0.27';
 
     /**
      * Get singleton instance
@@ -148,6 +148,8 @@ final class Plugin
         add_action('wp_ajax_cart_quote_admin_create_event', [$this, 'handle_admin_create_event']);
         add_action('wp_ajax_cart_quote_admin_resend_email', [$this, 'handle_admin_resend_email']);
         add_action('wp_ajax_cart_quote_admin_save_notes', [$this, 'handle_admin_save_notes']);
+        add_action('wp_ajax_cart_quote_admin_update_meeting', [$this, 'handle_admin_update_meeting']);
+        add_action('wp_ajax_cart_quote_admin_create_meet', [$this, 'handle_admin_create_meet']);
         add_action('wp_ajax_cart_quote_admin_export_csv', [$this, 'handle_admin_export_csv']);
         add_action('wp_ajax_cart_quote_google_oauth_callback', [$this, 'handle_google_oauth_callback']);
         add_action('wp_ajax_cart_quote_google_disconnect', [$this, 'handle_google_disconnect']);
@@ -220,6 +222,9 @@ final class Plugin
             'i18n' => [
                 'confirmDelete' => __('Are you sure you want to delete this quote?', 'cart-quote-woocommerce-email'),
                 'confirmStatusChange' => __('Are you sure you want to change the status?', 'cart-quote-woocommerce-email'),
+                'confirmSaveNotes' => __('Are you sure you want to save these notes?', 'cart-quote-woocommerce-email'),
+                'confirmUpdateMeeting' => __('Are you sure you want to update the meeting date/time?', 'cart-quote-woocommerce-email'),
+                'confirmCreateMeet' => __('Create a Google Meet meeting for this quote?', 'cart-quote-woocommerce-email'),
                 'saving' => __('Saving...', 'cart-quote-woocommerce-email'),
                 'saved' => __('Saved!', 'cart-quote-woocommerce-email'),
                 'error' => __('An error occurred. Please try again.', 'cart-quote-woocommerce-email'),
@@ -438,6 +443,44 @@ final class Plugin
         $admin = $this->get_service('admin_manager');
         if ($admin) {
             $admin->handle_save_notes();
+        }
+    }
+
+    /**
+     * Handle admin update meeting AJAX
+     *
+     * @return void
+     */
+    public function handle_admin_update_meeting()
+    {
+        check_ajax_referer('cart_quote_admin_nonce', 'nonce');
+
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error(['message' => __('Unauthorized', 'cart-quote-woocommerce-email')]);
+        }
+
+        $admin = $this->get_service('admin_manager');
+        if ($admin) {
+            $admin->handle_update_meeting();
+        }
+    }
+
+    /**
+     * Handle admin create Google Meet AJAX
+     *
+     * @return void
+     */
+    public function handle_admin_create_meet()
+    {
+        check_ajax_referer('cart_quote_admin_nonce', 'nonce');
+
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error(['message' => __('Unauthorized', 'cart-quote-woocommerce-email')]);
+        }
+
+        $google = $this->get_service('google_calendar');
+        if ($google) {
+            $google->handle_create_meet();
         }
     }
 

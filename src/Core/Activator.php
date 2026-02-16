@@ -155,6 +155,7 @@ class Activator
         add_option('cart_quote_wc_google_refresh_token', '');
         add_option('cart_quote_wc_google_calendar_id', 'primary');
         add_option('cart_quote_wc_google_connected', false);
+        add_option('cart_quote_wc_enable_google_meet', false);
 
         // Status settings
         add_option('cart_quote_wc_default_status', 'pending');

@@ -36,6 +36,12 @@
             // Save notes
             $(document).on('click', '.cart-quote-save-notes', this.saveNotes);
 
+            // Update meeting
+            $(document).on('click', '.cart-quote-update-meeting', this.updateMeeting);
+
+            // Create Google Meet
+            $(document).on('click', '.cart-quote-create-meet', this.createGoogleMeet);
+
             // Export CSV
             $(document).on('click', '.cart-quote-export-csv', this.exportCSV);
 
@@ -211,6 +217,10 @@
             var quoteId = $btn.data('quote-id');
             var notes = $('#admin_notes').val();
 
+            if (!confirm(cartQuoteAdmin.i18n.confirmSaveNotes)) {
+                return;
+            }
+
             $btn.prop('disabled', true).text(cartQuoteAdmin.i18n.saving);
 
             $.ajax({
@@ -234,6 +244,91 @@
                 },
                 complete: function() {
                     $btn.prop('disabled', false).text('Save Notes');
+                }
+            });
+        },
+
+        /**
+         * Update meeting date/time
+         */
+        updateMeeting: function(e) {
+            e.preventDefault();
+
+            var $btn = $(this);
+            var quoteId = $btn.data('quote-id');
+            var preferredDate = $('#meeting_date').val();
+            var preferredTime = $('#meeting_time').val();
+
+            if (!confirm(cartQuoteAdmin.i18n.confirmUpdateMeeting)) {
+                return;
+            }
+
+            $btn.prop('disabled', true).text(cartQuoteAdmin.i18n.saving);
+
+            $.ajax({
+                url: cartQuoteAdmin.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'cart_quote_admin_update_meeting',
+                    nonce: cartQuoteAdmin.nonce,
+                    id: quoteId,
+                    preferred_date: preferredDate,
+                    preferred_time: preferredTime
+                },
+                success: function(response) {
+                    if (response.success) {
+                        CartQuoteAdmin.showToast(response.data.message, 'success');
+                    } else {
+                        CartQuoteAdmin.showToast(response.data.message, 'error');
+                    }
+                },
+                error: function() {
+                    CartQuoteAdmin.showToast(cartQuoteAdmin.i18n.error, 'error');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).text('Update Meeting');
+                }
+            });
+        },
+
+        /**
+         * Create Google Meet
+         */
+        createGoogleMeet: function(e) {
+            e.preventDefault();
+
+            var $btn = $(this);
+            var quoteId = $btn.data('quote-id');
+
+            if (!confirm(cartQuoteAdmin.i18n.confirmCreateMeet)) {
+                return;
+            }
+
+            $btn.prop('disabled', true).text(cartQuoteAdmin.i18n.creatingEvent);
+
+            $.ajax({
+                url: cartQuoteAdmin.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'cart_quote_admin_create_meet',
+                    nonce: cartQuoteAdmin.nonce,
+                    id: quoteId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        CartQuoteAdmin.showToast(response.data.message, 'success');
+                        if (response.data.meet_link) {
+                            CartQuoteAdmin.showToast('Meet Link: ' + response.data.meet_link, 'success');
+                        }
+                        location.reload();
+                    } else {
+                        CartQuoteAdmin.showToast(response.data.message, 'error');
+                        $btn.prop('disabled', false).text('Create Google Meet');
+                    }
+                },
+                error: function() {
+                    CartQuoteAdmin.showToast(cartQuoteAdmin.i18n.error, 'error');
+                    $btn.prop('disabled', false).text('Create Google Meet');
                 }
             });
         },
