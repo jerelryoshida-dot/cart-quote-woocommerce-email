@@ -291,6 +291,7 @@ class Admin_Manager
 
         // Status settings
         update_option('cart_quote_wc_auto_create_event', isset($_POST['auto_create_event']));
+        update_option('cart_quote_wc_enable_google_meet', isset($_POST['enable_google_meet']));
         update_option('cart_quote_wc_delete_on_uninstall', isset($_POST['delete_on_uninstall']));
     }
 
@@ -397,6 +398,83 @@ class Admin_Manager
             }
         } catch (\Exception $e) {
             $this->logger->error('Exception in handle_save_notes', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            wp_send_json_error(['message' => __('An error occurred.', 'cart-quote-woocommerce-email')]);
+        }
+    }
+
+    /**
+     * Handle update meeting AJAX
+     *
+     * @return void
+     */
+    public function handle_update_meeting(): void
+    {
+        try {
+            $id = (int) ($_POST['id'] ?? 0);
+            $preferred_date = sanitize_text_field($_POST['preferred_date'] ?? '');
+            $preferred_time = sanitize_text_field($_POST['preferred_time'] ?? '');
+
+            if (!$id) {
+                wp_send_json_error(['message' => __('Invalid quote ID.', 'cart-quote-woocommerce-email')]);
+                return;
+            }
+
+            if ($preferred_date && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $preferred_date)) {
+                wp_send_json_error(['message' => __('Invalid date format. Use YYYY-MM-DD.', 'cart-quote-woocommerce-email')]);
+                return;
+            }
+
+            if ($preferred_time && !preg_match('/^\d{2}:\d{2}$/', $preferred_time)) {
+                wp_send_json_error(['message' => __('Invalid time format. Use HH:MM.', 'cart-quote-woocommerce-email')]);
+                return;
+            }
+
+            $update_data = [];
+            if ($preferred_date !== '') {
+                $update_data['preferred_date'] = $preferred_date;
+            }
+            if ($preferred_time !== '') {
+                $update_data['preferred_time'] = $preferred_time;
+            }
+
+            if (empty($update_data)) {
+                wp_send_json_error(['message' => __('No meeting data to update.', 'cart-quote-woocommerce-email')]);
+                return;
+            }
+
+            $result = $this->repository->update($id, $update_data);
+
+            if ($result) {
+                $quote = $this->repository->find($id);
+                if ($quote) {
+                    $this->repository->log(
+                        $quote->quote_id,
+                        'meeting_updated',
+                        sprintf('Meeting updated to %s at %s', $preferred_date, $preferred_time),
+                        get_current_user_id()
+                    );
+                }
+
+                $this->logger->info('Meeting updated', [
+                    'quote_id' => $quote->quote_id ?? $id,
+                    'preferred_date' => $preferred_date,
+                    'preferred_time' => $preferred_time,
+                ]);
+
+                wp_send_json_success([
+                    'message' => __('Meeting updated successfully.', 'cart-quote-woocommerce-email'),
+                    'preferred_date' => $preferred_date,
+                    'preferred_time' => $preferred_time,
+                ]);
+            } else {
+                $this->logger->error('Failed to update meeting', ['id' => $id]);
+                wp_send_json_error(['message' => __('Failed to update meeting.', 'cart-quote-woocommerce-email')]);
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('Exception in handle_update_meeting', [
                 'exception' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);

@@ -431,3 +431,73 @@
         gap: 15px;
     }
 }
+
+/* Meeting Editor */
+.cart-quote-meeting-editor .card-content {
+    padding: 20px;
+}
+
+.meeting-editor-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.meeting-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.meeting-field label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #555;
+}
+
+.meeting-field input[type="date"],
+.meeting-field select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 150px;
+}
+
+.meeting-field .button {
+    margin-top: auto;
+}
+
+.meeting-google-actions {
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.meeting-google-actions .button-primary {
+    display: inline-flex;
+    align-items: center;
+}
+
+.cart-quote-create-meet .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Meeting Editor Responsive */
+@media (max-width: 782px) {
+    .meeting-editor-fields {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .meeting-field {
+        width: 100%;
+    }
+
+    .meeting-field input[type="date"],
+    .meeting-field select {
+        width: 100%;
+    }
+}
