@@ -1,6 +1,6 @@
 # Cart Quote WooCommerce & Email
 
-[![Version](https://img.shields.io/badge/version-1.0.52-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
+[![Version](https://img.shields.io/badge/version-1.0.54-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
 [![WordPress](https://img.shields.io/badge/WordPress-%3E%3D5.8-blue.svg)](https://wordpress.org/)
 [![WooCommerce](https://img.shields.io/badge/WooCommerce-%3E%3D6.0-purple.svg)](https://woocommerce.com/)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-777bb4.svg)](https://php.net/)
@@ -324,6 +324,13 @@ cart-quote-woocommerce-email/
 ```
 
 ## Changelog
+
+### 1.0.54
+- Console Logging: Added browser console logging for mini-cart debugging
+- Created assets/js/mini-cart-debug.js with MiniCartLogger utility class
+- Logs structured JSON data with timestamps (RAW_CART, GROUPED_DATA, PARENT_ITEMS, TIER_FILTER, TIER_DISPLAY, RENDER_COMPLETE)
+- Only activates when ?debug_mini_cart=1 is in URL
+- Helps identify tier data issues in browser DevTools Console tab
 
 ### 1.0.53
 - Debug Panel: Added plain text debug output to mini-cart
