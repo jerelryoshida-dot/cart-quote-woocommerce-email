@@ -40,7 +40,7 @@ final class Plugin
      *
      * @var string
      */
-    private $version = '1.0.45';
+    private $version = '1.0.46';
 
     /**
      * Get singleton instance
@@ -100,6 +100,7 @@ final class Plugin
             'checkout_replacement' => new \CartQuoteWooCommerce\WooCommerce\Checkout_Replacement(),
             'admin_manager' => new \CartQuoteWooCommerce\Admin\Admin_Manager(),
             'frontend_manager' => new \CartQuoteWooCommerce\Frontend\Frontend_Manager(),
+            'tier_meta_box' => new \CartQuoteWooCommerce\Admin\Tier_Meta_Box(),
         ];
     }
 
