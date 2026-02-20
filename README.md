@@ -1,6 +1,6 @@
 # Cart Quote WooCommerce & Email
 
-[![Version](https://img.shields.io/badge/version-1.0.51-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
+[![Version](https://img.shields.io/badge/version-1.0.52-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
 [![WordPress](https://img.shields.io/badge/WordPress-%3E%3D5.8-blue.svg)](https://wordpress.org/)
 [![WooCommerce](https://img.shields.io/badge/WooCommerce-%3E%3D6.0-purple.svg)](https://woocommerce.com/)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-777bb4.svg)](https://php.net/)
@@ -324,6 +324,11 @@ cart-quote-woocommerce-email/
 ```
 
 ## Changelog
+
+### 1.0.52
+- Bug fix: Restored selected_tier from session in get_cart_item_from_session()
+- Fixed mini-cart always showing tier 1 instead of selected tier
+- Added missing session restore for selected_tier field
 
 ### 1.0.51
 - Mini-Cart Tier Selection Fix: Filtered tier items to show only selected tier
