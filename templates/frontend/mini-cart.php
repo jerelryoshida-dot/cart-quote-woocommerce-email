@@ -399,6 +399,100 @@ foreach ($parent_items as $parent_key => $parent) {
 
         <?php if (!$is_empty) : ?>
             <div class="cart-quote-mini-dropdown">
+                <?php
+                echo '<pre style="background:#1a1a1a;color:#00ff00;padding:10px;margin:10px 0;font-size:10px;border:1px solid #00ff00;max-height:400px;overflow:auto;white-space:pre-wrap;word-wrap:break-word;">';
+                echo "=== MINI-CART RAW DATA ===\n";
+                echo "Time: " . date('Y-m-d H:i:s') . "\n\n";
+
+                echo "=== STEP 1: RAW CART ITEMS (WC()->cart->get_cart()) ===\n";
+                $raw_index = 0;
+                foreach (WC()->cart->get_cart() as $raw_key => $raw_item) {
+                    echo "[$raw_index] Cart Key: $raw_key\n";
+                    echo "    product_id: " . ($raw_item['product_id'] ?? 'N/A') . "\n";
+                    echo "    quantity: " . ($raw_item['quantity'] ?? 'N/A') . "\n";
+                    echo "    line_total: " . ($raw_item['line_total'] ?? 'N/A') . "\n";
+                    
+                    if (isset($raw_item['tier_data'])) {
+                        $td = $raw_item['tier_data'];
+                        echo "    tier_data:\n";
+                        echo "      tier_level: " . (isset($td['tier_level']) ? $td['tier_level'] : 'NULL') . "\n";
+                        echo "      description: " . (isset($td['description']) ? $td['description'] : 'NULL') . "\n";
+                        echo "      tier_name: " . (isset($td['tier_name']) ? $td['tier_name'] : 'NULL') . "\n";
+                        echo "      monthly_price: " . (isset($td['monthly_price']) ? $td['monthly_price'] : 'NULL') . "\n";
+                        echo "      hourly_price: " . (isset($td['hourly_price']) ? $td['hourly_price'] : 'NULL') . "\n";
+                        
+                        if (isset($td['_all_tiers'])) {
+                            echo "      _all_tiers (" . count($td['_all_tiers']) . " available):\n";
+                            foreach ($td['_all_tiers'] as $at) {
+                                echo "        - Tier " . ($at['tier_level'] ?? '?') . ": " . ($at['description'] ?? 'N/A') . " ($" . ($at['monthly_price'] ?? 0) . "/mo)\n";
+                            }
+                        }
+                    } else {
+                        echo "    tier_data: NOT SET\n";
+                    }
+                    
+                    echo "    selected_tier: " . (isset($raw_item['selected_tier']) ? $raw_item['selected_tier'] : 'NULL (NOT SET)') . "\n";
+                    echo "\n";
+                    $raw_index++;
+                }
+
+                echo "=== STEP 2: GROUPED BY PRODUCT_ID ===\n";
+                echo "items_by_product (" . count($items_by_product) . " products):\n";
+                foreach ($items_by_product as $gpid => $gitems) {
+                    echo "  Product ID $gpid: " . count($gitems) . " item(s)\n";
+                }
+                echo "\n";
+
+                echo "=== STEP 3: TIER ITEMS BY PARENT ===\n";
+                echo "tier_items_by_parent (" . count($tier_items_by_parent) . " parents with tiers):\n";
+                foreach ($tier_items_by_parent as $tpid => $titems) {
+                    echo "  Product ID $tpid: " . count($titems) . " tier item(s)\n";
+                    foreach ($titems as $ti => $titem) {
+                        $ttd = $titem['tier_data'] ?? [];
+                        echo "    [$ti] tier_level=" . ($ttd['tier_level'] ?? 'NULL') . " selected_tier=" . (isset($titem['selected_tier']) ? $titem['selected_tier'] : 'NULL') . "\n";
+                    }
+                }
+                echo "\n";
+
+                echo "=== STEP 4: VIRTUAL PARENT ITEMS ===\n";
+                echo "parent_items (" . count($parent_items) . " items):\n";
+                foreach ($parent_items as $pi => $pitem) {
+                    echo "  [$pi] product_id=" . ($pitem['product_id'] ?? 'N/A') . " qty=" . ($pitem['quantity'] ?? 0) . " total=$" . number_format($pitem['line_total'] ?? 0, 2) . "\n";
+                }
+                echo "\n";
+
+                echo "=== STEP 5: FILTER LOGIC ===\n";
+                foreach ($parent_items as $fi => $fparent) {
+                    $fpid = $fparent['product_id'];
+                    $ftier_items = isset($tier_items_by_parent[$fpid]) ? $tier_items_by_parent[$fpid] : [];
+                    $fselected = null;
+                    if (!empty($ftier_items)) {
+                        $fselected = isset($ftier_items[0]['selected_tier']) ? (int)$ftier_items[0]['selected_tier'] : 1;
+                    }
+                    $fbefore = count($ftier_items);
+                    
+                    echo "Parent [$fi] (Product ID $fpid):\n";
+                    echo "  Reading selected_tier from \$tier_items[0]['selected_tier']\n";
+                    echo "  selected_tier = " . ($fselected ?? 'NULL') . " (" . ($fselected ? 'EXPLICIT' : 'DEFAULTS TO 1') . ")\n";
+                    echo "  Items before filter: $fbefore\n";
+                    
+                    if ($fselected && !empty($ftier_items)) {
+                        $fafter = 0;
+                        foreach ($ftier_items as $fitem) {
+                            $ftd = $fitem['tier_data'] ?? [];
+                            $fmatch = isset($ftd['tier_level']) && (int)$ftd['tier_level'] === $fselected;
+                            echo "    Checking: tier_level=" . ($ftd['tier_level'] ?? 'NULL') . " vs selected_tier=$fselected -> " . ($fmatch ? 'MATCH' : 'NO MATCH') . "\n";
+                            if ($fmatch) $fafter++;
+                        }
+                        echo "  Items after filter: $fafter\n";
+                    } else {
+                        echo "  No filter (selected_tier is null or no tier items)\n";
+                    }
+                    echo "\n";
+                }
+                echo "</pre>";
+                ?>
+                
                 <?php if (!empty($parent_items)) : ?>
                     <?php
                     $parent_loop_index = 0;
