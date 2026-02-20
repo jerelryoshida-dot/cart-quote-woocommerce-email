@@ -85,6 +85,21 @@ if (!$is_empty) {
         
         $item_index++;
     }
+
+    if (isset($_GET['debug_mini_cart']) || isset($_GET['debug_cart'])) {
+        $raw_cart_items = [];
+        foreach (WC()->cart->get_cart() as $ck => $ci) {
+            $raw_cart_items[] = [
+                'key' => $ck,
+                'product_id' => $ci['product_id'] ?? null,
+                'tier_data' => $ci['tier_data'] ?? null,
+                'selected_tier' => $ci['selected_tier'] ?? null,
+                'quantity' => $ci['quantity'] ?? 0,
+                'line_total' => $ci['line_total'] ?? 0,
+            ];
+        }
+        echo '<script>if(typeof MiniCartLogger!=="undefined"){MiniCartLogger.logRawCart(' . json_encode($raw_cart_items, JSON_HEX_TAG) . ');}</script>';
+    }
     
     if ($debug_log) {
         error_log('STEP 3: GROUPING ITEMS BY PRODUCT_ID');
@@ -122,6 +137,30 @@ if (!$is_empty) {
         }
         
         $parent_items[] = $parent_item;
+    }
+
+    if (isset($_GET['debug_mini_cart']) || isset($_GET['debug_cart'])) {
+        $console_grouped = [];
+        foreach ($items_by_product as $pid => $items) {
+            $console_grouped[$pid] = count($items);
+        }
+        $console_tier_grouped = [];
+        foreach ($tier_items_by_parent as $pid => $tiers) {
+            $console_tier_grouped[$pid] = count($tiers);
+        }
+        echo '<script>if(typeof MiniCartLogger!=="undefined"){MiniCartLogger.logGroupedData(' . json_encode($console_grouped, JSON_HEX_TAG) . ',' . json_encode($console_tier_grouped, JSON_HEX_TAG) . ');}</script>';
+    }
+
+    if (isset($_GET['debug_mini_cart']) || isset($_GET['debug_cart'])) {
+        $console_parent = [];
+        foreach ($parent_items as $p) {
+            $console_parent[] = [
+                'product_id' => $p['product_id'],
+                'quantity' => $p['quantity'],
+                'line_total' => $p['line_total'],
+            ];
+        }
+        echo '<script>if(typeof MiniCartLogger!=="undefined"){MiniCartLogger.logParentItems(' . json_encode($console_parent, JSON_HEX_TAG) . ');}</script>';
     }
     
     if ($debug_log) {
@@ -165,6 +204,10 @@ if ($debug_log) {
 }
 ?>
 <div class="cart-quote-mini-cart-container" data-nonce="<?php echo esc_attr(wp_create_nonce('cart_quote_frontend_nonce')); ?>">
+    <?php if (isset($_GET['debug_mini_cart']) || isset($_GET['debug_cart'])) : ?>
+    <script type="text/javascript">window.cartQuoteDebugMiniCart = true;</script>
+    <script src="<?php echo esc_url(CART_QUOTE_WC_PLUGIN_URL . 'assets/js/mini-cart-debug.js'); ?>"></script>
+    <?php endif; ?>
     <?php if (isset($_GET['debug_mini_cart']) || isset($_GET['debug_cart'])) : ?>
     <div class="cart-quote-debug-panel" style="
         background: #f0f0f0;
@@ -371,11 +414,19 @@ foreach ($parent_items as $parent_key => $parent) {
                                 : 1;
                         }
 
+                        $tier_count_before = count($tier_items);
+
                         if ($selected_tier && !empty($tier_items)) {
                             $tier_items = array_filter($tier_items, function($item) use ($selected_tier) {
                                 return isset($item['tier_data']['tier_level'])
                                     && (int) $item['tier_data']['tier_level'] === $selected_tier;
                             });
+                        }
+
+                        $tier_count_after = count($tier_items);
+
+                        if (isset($_GET['debug_mini_cart']) || isset($_GET['debug_cart'])) {
+                            echo '<script>if(typeof MiniCartLogger!=="undefined"){MiniCartLogger.logTierFiltering(' . $parent_id . ',' . ($selected_tier ?? 'null') . ',' . $tier_count_before . ',' . $tier_count_after . ');}</script>';
                         }
 
                         if ($debug_log) {
@@ -427,6 +478,16 @@ foreach ($parent_items as $parent_key => $parent) {
                                 error_log('      Display label: "' . $tier_label . '"');
                                 error_log('');
                             }
+
+                            if (isset($_GET['debug_mini_cart']) || isset($_GET['debug_cart'])) {
+                                $console_tier = [
+                                    'tier_data' => $tier_data,
+                                    'selected_tier' => $tier['selected_tier'] ?? null,
+                                    'quantity' => $tier['quantity'] ?? 0,
+                                    'line_total' => $tier['line_total'] ?? 0,
+                                ];
+                                echo '<script>if(typeof MiniCartLogger!=="undefined"){MiniCartLogger.logTierDisplay(' . json_encode($console_tier, JSON_HEX_TAG) . ',' . json_encode($tier_label, JSON_HEX_TAG) . ');}</script>';
+                            }
                             
                             $tier_loop_index++;
                             ?>
@@ -450,6 +511,9 @@ foreach ($parent_items as $parent_key => $parent) {
                             <div class="cart-quote-item-separator"></div>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <?php if (isset($_GET['debug_mini_cart']) || isset($_GET['debug_cart'])) : ?>
+                        <script>if(typeof MiniCartLogger!=="undefined"){MiniCartLogger.logRenderComplete(<?php echo count($parent_items); ?>,<?php echo isset($tier_items) ? count($tier_items) : 0; ?>);}</script>
+                    <?php endif; ?>
                 <?php else : ?>
                     <?php 
                     if ($debug_log) {
