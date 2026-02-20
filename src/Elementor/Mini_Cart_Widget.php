@@ -1849,10 +1849,27 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
                                                     <?php echo wc_price($cart_item['line_total']); ?>
                                                 </span>
                                             </div>
-                                            <?php if ($tier_data && !empty($tier_data['description']) && $settings['show_tier_badge'] === 'yes') : ?>
+                                            <?php 
+                                            $tier_label = '';
+                                            if ($tier_data) {
+                                                if (!empty($tier_data['tier_level'])) {
+                                                    $tier_label = esc_html__('Tier', 'cart-quote-woocommerce-email') . ' ' . esc_html($tier_data['tier_level']);
+                                                    if (!empty($tier_data['description'])) {
+                                                        $tier_label .= ': ' . esc_html($tier_data['description']);
+                                                    } elseif (!empty($tier_data['tier_name'])) {
+                                                        $tier_label .= ': ' . esc_html($tier_data['tier_name']);
+                                                    }
+                                                } elseif (!empty($tier_data['description'])) {
+                                                    $tier_label = esc_html($tier_data['description']);
+                                                } elseif (!empty($tier_data['tier_name'])) {
+                                                    $tier_label = esc_html($tier_data['tier_name']);
+                                                }
+                                            }
+                                            
+                                            if ($tier_label && $settings['show_tier_badge'] === 'yes') : ?>
                                                 <div class="item-tier-badge">
                                                     <span class="tier-desc">
-                                                        <?php echo esc_html($tier_data['description']); ?>
+                                                        <?php echo $tier_label; ?>
                                                         <span class="tier-qty">x<?php echo esc_html($cart_item['quantity']); ?></span>
                                                     </span>
                                                     <span class="tier-price">

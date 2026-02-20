@@ -586,14 +586,30 @@ function isValidEmail(email) {
                                         var $item = $('<li class="cart-quote-mini-item"></li>');
                                         
                                         var tierBadgeHtml = '';
-                                        if (item.tier_data && item.tier_data.description) {
-                                            tierBadgeHtml = '<div class="item-tier-badge">' +
-                                                '<span class="tier-desc">' +
-                                                    item.tier_data.description +
-                                                    '<span class="tier-qty">x' + item.quantity + '</span>' +
-                                                '</span>' +
-                                                '<span class="tier-price">' + item.line_total + '</span>' +
-                                            '</div>';
+                                        if (item.tier_data) {
+                                            var tierLabel = '';
+                                            if (item.tier_data.tier_level) {
+                                                tierLabel = 'Tier ' + item.tier_data.tier_level;
+                                                if (item.tier_data.description) {
+                                                    tierLabel += ': ' + item.tier_data.description;
+                                                } else if (item.tier_data.tier_name) {
+                                                    tierLabel += ': ' + item.tier_data.tier_name;
+                                                }
+                                            } else if (item.tier_data.description) {
+                                                tierLabel = item.tier_data.description;
+                                            } else if (item.tier_data.tier_name) {
+                                                tierLabel = item.tier_data.tier_name;
+                                            }
+                                            
+                                            if (tierLabel) {
+                                                tierBadgeHtml = '<div class="item-tier-badge">' +
+                                                    '<span class="tier-desc">' +
+                                                        tierLabel +
+                                                        '<span class="tier-qty">x' + item.quantity + '</span>' +
+                                                    '</span>' +
+                                                    '<span class="tier-price">' + item.line_total + '</span>' +
+                                                '</div>';
+                                            }
                                         }
                                         
                                         $item.html(
