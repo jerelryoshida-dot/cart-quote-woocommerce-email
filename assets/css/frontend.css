@@ -266,65 +266,79 @@
     overflow-y: auto;
 }
 
-/* Item Base Styles */
+/* Item Base Styles - Grid Layout */
 .cart-quote-mini-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     padding: 8px 0;
 }
 
 .cart-quote-mini-item .item-name {
-    flex: 1;
     color: #333;
     font-size: 14px;
     line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .cart-quote-mini-item .item-qty {
-    min-width: 40px;
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+    min-width: 25px;
     text-align: center;
-    font-size: 13px;
-    color: #999;
-    font-weight: 500;
 }
 
 .cart-quote-mini-item .item-price {
-    min-width: 60px;
-    text-align: right;
     font-weight: 600;
     color: #0073aa;
     font-size: 14px;
+    text-align: right;
+    white-space: nowrap;
 }
 
 /* Parent Item Styles */
 .cart-quote-mini-item.parent-item {
-    font-weight: 600;
-    padding: 10px 0;
-    font-size: 15px;
+    padding: 10px 0 6px 0;
 }
 
 .cart-quote-mini-item.parent-item .item-name {
     color: #333;
     font-weight: 600;
+    font-size: 14px;
+}
+
+.cart-quote-mini-item.parent-item .item-qty {
+    color: #666;
+    font-size: 12px;
 }
 
 /* Tier Item Styles */
 .cart-quote-mini-item.tier-item {
-    padding-left: 8px;
-    font-weight: 400;
+    padding: 4px 0 8px 0;
 }
 
 .cart-quote-mini-item.tier-item .item-name {
     color: #666;
     font-size: 13px;
+    font-weight: 400;
+    padding-left: 0;
+}
+
+.cart-quote-mini-item.tier-item .item-qty {
+    color: #888;
+    font-size: 12px;
 }
 
 /* Separator Line */
 .cart-quote-item-separator {
     height: 1px;
-    background: linear-gradient(to right, transparent, #e0e0e0, transparent);
-    margin: 8px 0 12px 0;
+    background: linear-gradient(to right, transparent, #ddd, transparent);
+    margin: 4px 0 8px 0;
 }
 
 /* Legacy Tier Badge - Pill Style (kept for compatibility) */
