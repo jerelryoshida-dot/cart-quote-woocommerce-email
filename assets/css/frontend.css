@@ -178,10 +178,46 @@
     cursor: pointer;
 }
 
-.cart-quote-mini-cart i {
-    font-size: 20px;
+/* Toggle Button */
+.cart-quote-mini-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 5px 0;
+    transition: background 0.2s ease;
 }
 
+.cart-quote-mini-toggle:hover {
+    opacity: 0.9;
+}
+
+.cart-quote-toggle-icon {
+    font-size: 20px;
+    color: #333;
+}
+
+.cart-quote-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.cart-count-badge {
+    font-weight: 700;
+    color: #333;
+}
+
+.cart-quote-mini-subtotal {
+    margin-left: auto;
+    font-weight: 700;
+    font-size: 14px;
+    color: #0073aa;
+}
+
+/* Legacy count badge (for compatibility) */
 .cart-quote-mini-count {
     position: absolute;
     top: -5px;
@@ -201,10 +237,6 @@
 
 .cart-quote-mini-count.cart-empty {
     display: none;
-}
-
-.cart-quote-mini-subtotal {
-    font-weight: 600;
 }
 
 /* Mini Cart Dropdown */
@@ -230,47 +262,78 @@
     list-style: none;
     margin: 0 0 15px;
     padding: 0;
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
 }
 
+/* Item Base Styles */
 .cart-quote-mini-item {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.cart-quote-mini-item .item-name {
+    flex: 1;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.cart-quote-mini-item .item-qty {
+    min-width: 40px;
+    text-align: center;
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+}
+
+.cart-quote-mini-item .item-price {
+    min-width: 60px;
+    text-align: right;
+    font-weight: 600;
+    color: #0073aa;
+    font-size: 14px;
+}
+
+/* Parent Item Styles */
+.cart-quote-mini-item.parent-item {
+    font-weight: 600;
     padding: 10px 0;
-    border-bottom: 1px solid #eee;
-    gap: 6px;
+    font-size: 15px;
 }
 
-.cart-quote-mini-item:last-child {
-    border-bottom: none;
+.cart-quote-mini-item.parent-item .item-name {
+    color: #333;
+    font-weight: 600;
 }
 
+/* Tier Item Styles */
+.cart-quote-mini-item.tier-item {
+    padding-left: 8px;
+    font-weight: 400;
+}
+
+.cart-quote-mini-item.tier-item .item-name {
+    color: #666;
+    font-size: 13px;
+}
+
+/* Separator Line */
+.cart-quote-item-separator {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+    margin: 8px 0 12px 0;
+}
+
+/* Legacy Tier Badge - Pill Style (kept for compatibility) */
 .cart-quote-mini-item .item-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.cart-quote-mini-item .item-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-}
-
-.cart-quote-mini-item .item-qty {
-    color: #999;
-    margin-left: 5px;
-    font-size: 14px;
-}
-
-.cart-quote-mini-item .item-header .item-price {
-    font-weight: 600;
-    color: #333;
-    text-align: right;
-}
-
-/* Tier Badge - Pill Style with Price */
 .cart-quote-mini-item .item-tier-badge {
     display: flex;
     justify-content: space-between;
@@ -281,6 +344,7 @@
     font-size: 12px;
     border: 1px solid #90caf9;
     gap: 12px;
+    margin-top: 6px;
 }
 
 .cart-quote-mini-item .tier-desc {
@@ -304,12 +368,6 @@
     font-weight: 700;
     margin-left: auto;
     white-space: nowrap;
-}
-
-.cart-quote-mini-item .item-price {
-    font-weight: 600;
-    text-align: right;
-    color: #333;
 }
 
 .cart-quote-mini-empty {

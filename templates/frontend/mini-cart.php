@@ -13,18 +13,31 @@ if (!defined('ABSPATH')) {
 $cart_count = WC()->cart->get_cart_contents_count();
 $cart_subtotal = WC()->cart->get_cart_subtotal();
 $is_empty = WC()->cart->is_empty();
+
+$parent_items = [];
+$tier_items_by_parent = [];
+
+if (!$is_empty) {
+    foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+        if (isset($cart_item['tier_data'])) {
+            $parent_id = $cart_item['product_id'];
+            $tier_items_by_parent[$parent_id][] = $cart_item;
+        } else {
+            $parent_items[] = $cart_item;
+        }
+    }
+}
 ?>
 <div class="cart-quote-mini-cart-container" data-nonce="<?php echo esc_attr(wp_create_nonce('cart_quote_frontend_nonce')); ?>">
     <div class="cart-quote-mini-cart">
         <div class="cart-quote-mini-toggle">
-            <span class="dashicons dashicons-cart"></span>
-
-            <?php if ($atts['show_count'] === 'true') : ?>
-                <span class="cart-quote-mini-count <?php echo $is_empty ? 'cart-empty' : ''; ?>">
-                    <?php echo esc_html($cart_count); ?>
-                </span>
-            <?php endif; ?>
-
+            <span class="dashicons dashicons-cart cart-quote-toggle-icon"></span>
+            
+            <span class="cart-quote-label">
+                <?php esc_html_e('Cart', 'cart-quote-woocommerce-email'); ?>
+                <span class="cart-count-badge">(<?php echo esc_html($cart_count); ?>)</span>
+            </span>
+            
             <?php if ($atts['show_subtotal'] === 'true') : ?>
                 <span class="cart-quote-mini-subtotal">
                     <?php echo wp_kses_post($cart_subtotal); ?>
@@ -34,35 +47,68 @@ $is_empty = WC()->cart->is_empty();
 
         <?php if (!$is_empty) : ?>
             <div class="cart-quote-mini-dropdown">
-                <ul class="cart-quote-mini-items">
-                    <?php foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) : ?>
+                <?php if (!empty($parent_items)) : ?>
+                    <?php foreach ($parent_items as $parent_key => $parent) : ?>
                         <?php 
-                        $product = $cart_item['data']; 
-                        $tier_data = isset($cart_item['tier_data']) ? $cart_item['tier_data'] : null;
+                        $product = $parent['data'];
+                        $parent_id = $product->get_id();
+                        $tier_items = isset($tier_items_by_parent[$parent_id]) ? $tier_items_by_parent[$parent_id] : [];
                         ?>
-                        <li class="cart-quote-mini-item">
-                            <div class="item-header">
+                        
+                        <div class="cart-quote-mini-item parent-item">
+                            <span class="item-name">
+                                <?php echo esc_html($product->get_name()); ?>
+                            </span>
+                            <span class="item-qty">x<?php echo esc_html($parent['quantity']); ?></span>
+                            <span class="item-price"><?php echo wc_price($parent['line_total']); ?></span>
+                        </div>
+                        
+                        <?php foreach ($tier_items as $tier) : ?>
+                            <?php 
+                            $tier_data = $tier['tier_data'];
+                            $tier_label = '';
+                            
+                            if (!empty($tier_data['tier_level'])) {
+                                $tier_label .= esc_html__('Tier', 'cart-quote-woocommerce-email') . ' ' . esc_html($tier_data['tier_level']);
+                                $tier_label .= ': ';
+                            }
+                            if (!empty($tier_data['description'])) {
+                                $tier_label .= esc_html($tier_data['description']);
+                            } elseif (!empty($tier_data['tier_name'])) {
+                                $tier_label .= esc_html($tier_data['tier_name']);
+                            }
+                            ?>
+                            
+                            <div class="cart-quote-mini-item tier-item">
+                                <span class="item-name">
+                                    • <?php echo $tier_label; ?>
+                                </span>
+                                <span class="item-qty">x<?php echo esc_html($tier['quantity']); ?></span>
+                                <span class="item-price"><?php echo wc_price($tier['line_total']); ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                        
+                        <?php if ($parent_key < count($parent_items) - 1) : ?>
+                            <div class="cart-quote-item-separator"></div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <ul class="cart-quote-mini-items">
+                        <?php foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) : ?>
+                            <?php 
+                            $product = $cart_item['data'];
+                            $tier_data = isset($cart_item['tier_data']) ? $cart_item['tier_data'] : null;
+                            ?>
+                            <li class="cart-quote-mini-item">
                                 <span class="item-name">
                                     <?php echo esc_html($product->get_name()); ?>
                                 </span>
-                                <span class="item-price">
-                                    <?php echo wc_price($cart_item['line_total']); ?>
-                                </span>
-                            </div>
-                            <?php if ($tier_data && !empty($tier_data['description'])) : ?>
-                                <div class="item-tier-badge">
-                                    <span class="tier-desc">
-                                        <?php echo esc_html($tier_data['description']); ?>
-                                        <span class="tier-qty">x<?php echo esc_html($cart_item['quantity']); ?></span>
-                                    </span>
-                                    <span class="tier-price">
-                                        <?php echo wc_price($cart_item['line_total']); ?>
-                                    </span>
-                                </div>
-                            <?php endif; ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
+                                <span class="item-qty">x<?php echo esc_html($cart_item['quantity']); ?></span>
+                                <span class="item-price"><?php echo wc_price($cart_item['line_total']); ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
 
                 <div class="cart-quote-mini-total">
                     <strong><?php esc_html_e('Subtotal:', 'cart-quote-woocommerce-email'); ?></strong>
