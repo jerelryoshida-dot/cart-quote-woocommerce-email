@@ -53,12 +53,26 @@ if (!$is_empty) {
                         $product = $parent['data'];
                         $parent_id = $product->get_id();
                         $tier_items = isset($tier_items_by_parent[$parent_id]) ? $tier_items_by_parent[$parent_id] : [];
+                        
+                        // Calculate sum of tier prices and quantities
+                        $tier_total = 0;
+                        $tier_qty_sum = 0;
+                        foreach ($tier_items as $tier) {
+                            $tier_total += $tier['line_total'];
+                            $tier_qty_sum += $tier['quantity'];
+                        }
+                        
+                        // Parent price = tier sum if tiers exist, otherwise parent's own price
+                        $parent_price = !empty($tier_items) ? $tier_total : $parent['line_total'];
+                        
+                        // Parent quantity = sum of tier quantities if tiers exist, otherwise parent's own quantity
+                        $parent_qty = !empty($tier_items) ? $tier_qty_sum : $parent['quantity'];
                         ?>
                         
                         <div class="cart-quote-mini-item parent-item">
                             <span class="item-name"><?php echo esc_html($product->get_name()); ?></span>
-                            <span class="item-qty">X<?php echo esc_html($parent['quantity']); ?></span>
-                            <span class="item-price"><?php echo wc_price($parent['line_total']); ?></span>
+                            <span class="item-qty">X<?php echo esc_html($parent_qty); ?></span>
+                            <span class="item-price"><?php echo wc_price($parent_price); ?></span>
                         </div>
                         
                         <?php foreach ($tier_items as $tier) : ?>
