@@ -184,13 +184,27 @@ if ($debug_log) {
         <?php if (!$is_empty) : ?>
             <div class="cart-quote-mini-dropdown">
                 <?php if (!empty($parent_items)) : ?>
-                    <?php 
+                    <?php
                     $parent_loop_index = 0;
-                    foreach ($parent_items as $parent_key => $parent) : 
+                    foreach ($parent_items as $parent_key => $parent) :
                         $product = $parent['data'];
                         $parent_id = $parent['product_id'];
                         $tier_items = isset($tier_items_by_parent[$parent_id]) ? $tier_items_by_parent[$parent_id] : [];
-                        
+
+                        $selected_tier = null;
+                        if (!empty($tier_items)) {
+                            $selected_tier = isset($tier_items[0]['selected_tier'])
+                                ? (int) $tier_items[0]['selected_tier']
+                                : 1;
+                        }
+
+                        if ($selected_tier && !empty($tier_items)) {
+                            $tier_items = array_filter($tier_items, function($item) use ($selected_tier) {
+                                return isset($item['tier_data']['tier_level'])
+                                    && (int) $item['tier_data']['tier_level'] === $selected_tier;
+                            });
+                        }
+
                         if ($debug_log) {
                             error_log('  PARENT ITEM [' . $parent_loop_index . ']');
                             error_log('  ----------------------------------------');
@@ -198,10 +212,13 @@ if ($debug_log) {
                             error_log('    Product ID: ' . $parent_id);
                             error_log('    Aggregated qty: X' . $parent['quantity']);
                             error_log('    Aggregated price: $' . number_format($parent['line_total'], 2));
+                            error_log('    Selected tier: ' . ($selected_tier ?? 'N/A'));
+                            error_log('    Tier items before filter: ' . count($tier_items_by_parent[$parent_id] ?? []));
+                            error_log('    Tier items after filter: ' . count($tier_items));
                             error_log('    Has tier items: ' . (!empty($tier_items) ? 'YES (' . count($tier_items) . ')' : 'NO'));
                             error_log('');
                         }
-                        
+
                         $parent_loop_index++;
                         ?>
                         
