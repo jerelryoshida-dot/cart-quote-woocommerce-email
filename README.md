@@ -1,6 +1,6 @@
 # Cart Quote WooCommerce & Email
 
-[![Version](https://img.shields.io/badge/version-1.0.36-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
+[![Version](https://img.shields.io/badge/version-1.0.51-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
 [![WordPress](https://img.shields.io/badge/WordPress-%3E%3D5.8-blue.svg)](https://wordpress.org/)
 [![WooCommerce](https://img.shields.io/badge/WooCommerce-%3E%3D6.0-purple.svg)](https://woocommerce.com/)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-777bb4.svg)](https://php.net/)
@@ -324,6 +324,12 @@ cart-quote-woocommerce-email/
 ```
 
 ## Changelog
+
+### 1.0.51
+- Mini-Cart Tier Selection Fix: Filtered tier items to show only selected tier
+- Added `selected_tier` detection logic (defaults to tier 1 if not specified)
+- Filtered `$tier_items` array to display only tier matching `selected_tier` value
+- Added debug logging for tier selection and filter results
 
 ### 1.0.36
 - New: Public Mini-Cart Refresh API for third-party plugin integration
