@@ -40,7 +40,7 @@ final class Plugin
      *
      * @var string
      */
-    private $version = '1.0.48';
+    private $version = '1.0.49';
 
     /**
      * Get singleton instance
@@ -556,12 +556,29 @@ final class Plugin
      */
     public function add_tier_data_to_cart($cart_item_data, $product_id)
     {
-        $tier_data = \CartQuoteWooCommerce\Services\Tier_Service::get_tier_data_for_cart($product_id);
-        
-        if ($tier_data) {
-            $cart_item_data['tier_data'] = $tier_data;
+        $selected_tier = isset($_REQUEST['tier']) 
+            ? (int) $_REQUEST['tier'] 
+            : 1;
+
+        $tier = \CartQuoteWooCommerce\Services\Tier_Service::get_tier_by_level(
+            $product_id,
+            $selected_tier
+        );
+
+        if ($tier) {
+            $all_tiers = \CartQuoteWooCommerce\Services\Tier_Service::get_all_tiers_by_product($product_id);
+
+            $cart_item_data['tier_data'] = [
+                'description'   => $tier['description'] ?? '',
+                'tier_name'     => $tier['tier_name'] ?? '',
+                'tier_level'    => $tier['tier_level'] ?? '',
+                'monthly_price' => (float) ($tier['monthly_price'] ?? 0),
+                'hourly_price'  => (float) ($tier['hourly_price'] ?? 0),
+                '_all_tiers'    => $all_tiers,
+            ];
+            $cart_item_data['selected_tier'] = $selected_tier;
         }
-        
+
         return $cart_item_data;
     }
 

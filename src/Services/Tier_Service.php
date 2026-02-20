@@ -80,6 +80,38 @@ class Tier_Service
         }
     }
 
+    public static function get_tier_by_level(int $product_id, int $tier_level): ?array
+    {
+        global $wpdb;
+
+        if ($product_id <= 0 || $tier_level <= 0) {
+            return null;
+        }
+
+        try {
+            $table = $wpdb->prefix . self::$table_name;
+
+            $tier = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM `{$table}` WHERE product_id = %d AND tier_level = %d LIMIT 1",
+                $product_id,
+                $tier_level
+            ), ARRAY_A);
+
+            return $tier ?: null;
+
+        } catch (\Exception $e) {
+            Debug_Logger::get_instance()->error(
+                'Failed to get tier by level',
+                [
+                    'product_id' => $product_id,
+                    'tier_level' => $tier_level,
+                    'error'      => $e->getMessage(),
+                ]
+            );
+            return null;
+        }
+    }
+
     public static function get_tier_data_for_cart(int $product_id): ?array
     {
         if ($product_id <= 0) {
