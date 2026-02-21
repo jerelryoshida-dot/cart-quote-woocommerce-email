@@ -221,7 +221,6 @@ if ($debug_log) {
                 </svg>
             </button>
         </div>
-    <?php endif; ?>
 
     <div class="cart-quote-mini-cart">
         <div class="cart-quote-mini-toggle">
