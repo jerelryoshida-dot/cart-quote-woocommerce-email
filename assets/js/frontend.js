@@ -677,6 +677,123 @@ function isValidEmail(email) {
         });
     };
     
+    /**
+     * Update mini-cart directly with provided data (no AJAX)
+     * Used by third-party plugins that already have cart data
+     * 
+     * @param {Object} cartData - Cart data from server
+     * @param {Array} cartData.items - Cart items array
+     * @param {number} cartData.count - Total item count
+     * @param {string} cartData.formatted_subtotal - Formatted subtotal HTML
+     * @param {boolean} cartData.is_empty - Whether cart is empty
+     */
+    window.cartQuoteUpdateMiniCart = function(cartData) {
+        if (!cartData) {
+            console.error('Cart Quote: cartQuoteUpdateMiniCart called without data');
+            return;
+        }
+        
+        // Update all mini-cart instances on page
+        $('.cart-quote-mini-cart-container').each(function() {
+            var $container = $(this);
+            var $cart = $container.find('.cart-quote-mini-cart');
+            var $toggle = $cart.find('.cart-quote-mini-toggle');
+            var $dropdown = $cart.find('.cart-quote-mini-dropdown');
+            
+            // Update count badge
+            var $count = $toggle.find('.cart-count-badge');
+            if ($count.length) {
+                $count.text('(' + cartData.count + ')');
+                if (cartData.count > 0) {
+                    $count.removeClass('cart-empty');
+                } else {
+                    $count.addClass('cart-empty');
+                }
+            }
+            
+            // Update subtotal in toggle
+            var $toggleSubtotal = $toggle.find('.cart-quote-mini-subtotal');
+            if ($toggleSubtotal.length) {
+                $toggleSubtotal.html(cartData.formatted_subtotal);
+            }
+            
+            // Update dropdown items and total
+            if (cartData.is_empty) {
+                // Show empty cart message
+                var emptyCartHTML = `
+                    <div class="cart-quote-mini-empty-state">
+                        <div class="empty-cart-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M3 3h2l8 4-8 4v2a2 2 0 012 2h12a2 2 0 012-2v-2a2 2 0 01-2 2z"/>
+                                <circle cx="9" cy="9" r="2"/>
+                            </svg>
+                        </div>
+                        <div class="empty-cart-content">
+                            <h3>Your cart is empty</h3>
+                            <p>Add items to get started</p>
+                        </div>
+                    </div>
+                `;
+                $dropdown.html(emptyCartHTML);
+            } else {
+                // Rebuild items list
+                var $itemsList = $dropdown.find('.cart-quote-mini-items');
+                if ($itemsList.length) {
+                    $itemsList.empty();
+                    
+                    cartData.items.forEach(function(item) {
+                        var $item = $('<li class="cart-quote-mini-item"></li>');
+                        
+                        var tierBadgeHtml = '';
+                        if (item.tier_data) {
+                            var tierLabel = '';
+                            if (item.tier_data.tier_level) {
+                                tierLabel = 'Tier ' + item.tier_data.tier_level;
+                                if (item.tier_data.description) {
+                                    tierLabel += ': ' + item.tier_data.description;
+                                } else if (item.tier_data.tier_name) {
+                                    tierLabel += ': ' + item.tier_data.tier_name;
+                                }
+                            } else if (item.tier_data.description) {
+                                tierLabel = item.tier_data.description;
+                            } else if (item.tier_data.tier_name) {
+                                tierLabel = item.tier_data.tier_name;
+                            }
+                            
+                            if (tierLabel) {
+                                tierBadgeHtml = '<div class="item-tier-badge">' +
+                                    '<span class="tier-desc">' +
+                                        tierLabel +
+                                        '<span class="tier-qty">x' + item.quantity + '</span>' +
+                                    '</span>' +
+                                    '<span class="tier-price">' + item.line_total + '</span>' +
+                                '</div>';
+                            }
+                        }
+                        
+                        $item.html(
+                            '<div class="item-header">' +
+                                '<span class="item-name">' + item.product_name + '</span>' +
+                                '<span class="item-price">' + item.line_total + '</span>' +
+                            '</div>' +
+                            tierBadgeHtml
+                        );
+                        $itemsList.append($item);
+                    });
+                }
+                
+                // Update subtotal in dropdown
+                var $amount = $dropdown.find('.cart-quote-mini-total .subtotal-amount');
+                if ($amount.length) {
+                    $amount.html(cartData.formatted_subtotal);
+                }
+            }
+        });
+        
+        // Trigger custom event for other scripts
+        $(document).trigger('cartQuoteMiniCartUpdated', [cartData]);
+    };
+    
     // Click toggle functionality - only toggle on the toggle button, not dropdown content
     var miniCartOpen = false;
     var miniCartTimer = null;
