@@ -110,18 +110,30 @@ if (!$is_empty) {
     if ($debug_log) {
         error_log('STEP 3: GROUPING ITEMS BY PRODUCT_ID');
         error_log('============================================================');
+        error_log('  IMPORTANT: Only items WITH tier_data are added to tier_items_by_parent');
+        error_log('  This ensures we only show tiers that are ACTUALLY IN THE CART');
+        error_log('  We do NOT use _all_tiers (which has all available tiers)');
+        error_log('');
         error_log('  Items grouped by product_id:');
         
         foreach ($items_by_product as $pid => $items) {
             error_log('    Product ID ' . $pid . ': ' . count($items) . ' item(s)');
             foreach ($items as $idx => $item) {
                 $td = $item['tier_data'] ?? [];
-                error_log('      [' . $idx . '] tier_level=' . ($td['tier_level'] ?? 'N/A') . ' description="' . ($td['description'] ?? 'N/A') . '"');
+                $has_tier = isset($item['tier_data']) ? 'YES -> added to tier_items_by_parent' : 'NO';
+                error_log('      [' . $idx . '] tier_level=' . ($td['tier_level'] ?? 'N/A') . ' description="' . ($td['description'] ?? 'N/A') . '" has_tier_data=' . $has_tier);
             }
         }
         error_log('');
     }
     
+    /**
+     * Group cart items by product_id
+     * 
+     * IMPORTANT: Only items with tier_data are added to tier_items_by_parent
+     * This ensures we only display tiers that are ACTUALLY IN THE CART
+     * We do NOT use _all_tiers (which contains all available tiers for the product)
+     */
     foreach ($items_by_product as $product_id => $items) {
         $first_item = $items[0];
         $product = $first_item['data'];
@@ -137,8 +149,15 @@ if (!$is_empty) {
             $parent_item['quantity'] += $item['quantity'];
             $parent_item['line_total'] += $item['line_total'];
             
+            // Only add items that have tier_data (i.e., tier items in cart)
+            // This is the key: we only show tiers that are IN THE CART
             if (isset($item['tier_data'])) {
                 $tier_items_by_parent[$product_id][] = $item;
+                
+                if ($debug_log) {
+                    $td = $item['tier_data'];
+                    error_log('      Added to tier_items_by_parent: Tier ' . ($td['tier_level'] ?? 'N/A') . ' - ' . ($td['description'] ?? 'N/A'));
+                }
             }
         }
         
@@ -271,6 +290,16 @@ if ($debug_log) {
                         </div>
 
                         <?php
+                        /**
+                         * Display tier items for this parent product
+                         * 
+                         * KEY BEHAVIOR:
+                         * - $tier_items contains ONLY the tier items that are IN THE CART
+                         * - We do NOT filter by selected_tier
+                         * - We do NOT show all available tiers from _all_tiers
+                         * - If user added Tier 1 and Tier 2, BOTH will be displayed
+                         * - If user only added Tier 2, only Tier 2 will be displayed
+                         */
                         if (isset($atts['show_tier_items']) && ($atts['show_tier_items'] === 'true' || $atts['show_tier_items'] === 'yes')) :
                             $tier_loop_index = 0;
                             foreach ($tier_items as $tier) :
