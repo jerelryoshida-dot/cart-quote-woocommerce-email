@@ -414,28 +414,6 @@ foreach ($parent_items as $parent_key => $parent) {
                         $parent_id = $parent['product_id'];
                         $tier_items = isset($tier_items_by_parent[$parent_id]) ? $tier_items_by_parent[$parent_id] : [];
 
-                        $selected_tier = null;
-                        if (!empty($tier_items)) {
-                            $selected_tier = isset($tier_items[0]['selected_tier'])
-                                ? (int) $tier_items[0]['selected_tier']
-                                : 1;
-                        }
-
-                        $tier_count_before = count($tier_items);
-
-                        if ($selected_tier && !empty($tier_items)) {
-                            $tier_items = array_filter($tier_items, function($item) use ($selected_tier) {
-                                return isset($item['tier_data']['tier_level'])
-                                    && (int) $item['tier_data']['tier_level'] === $selected_tier;
-                            });
-                        }
-
-                        $tier_count_after = count($tier_items);
-
-                        if ($debug_enabled) {
-                            echo '<script>if(typeof MiniCartLogger!=="undefined"){MiniCartLogger.logTierFiltering(' . $parent_id . ',' . ($selected_tier ?? 'null') . ',' . $tier_count_before . ',' . $tier_count_after . ');}</script>';
-                        }
-
                         if ($debug_log) {
                             error_log('  PARENT ITEM [' . $parent_loop_index . ']');
                             error_log('  ----------------------------------------');
@@ -443,9 +421,7 @@ foreach ($parent_items as $parent_key => $parent) {
                             error_log('    Product ID: ' . $parent_id);
                             error_log('    Aggregated qty: X' . $parent['quantity']);
                             error_log('    Aggregated price: $' . number_format($parent['line_total'], 2));
-                            error_log('    Selected tier: ' . ($selected_tier ?? 'N/A'));
-                            error_log('    Tier items before filter: ' . count($tier_items_by_parent[$parent_id] ?? []));
-                            error_log('    Tier items after filter: ' . count($tier_items));
+                            error_log('    Tier items: ' . count($tier_items));
                             error_log('    Has tier items: ' . (!empty($tier_items) ? 'YES (' . count($tier_items) . ')' : 'NO'));
                             error_log('');
                         }
