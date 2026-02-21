@@ -1780,6 +1780,8 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
             ]
         );
         
+        $this->end_controls_section();
+        
         // Toggle Behavior Section
         $this->start_controls_section(
             'toggle_behavior_section',
