@@ -165,6 +165,21 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
             ]
         );
 
+        $this->add_control(
+            'show_tier_items',
+            [
+                'label' => __('Show Tier Items', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'cart-quote-woocommerce-email'),
+                'label_off' => __('No', 'cart-quote-woocommerce-email'),
+                'default' => 'yes',
+                'description' => __('Display tier items under parent products with quantity controls', 'cart-quote-woocommerce-email'),
+                'condition' => [
+                    'show_cart_summary' => 'yes',
+                ],
+            ]
+        );
+
         $this->end_controls_section();
 
         // Content Section - Button
@@ -431,6 +446,236 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
         );
 
         $this->end_controls_section();
+
+        // Cart Summary Style Section
+        $this->start_controls_section(
+            'cart_summary_style_section',
+            [
+                'label' => __('Cart Summary Style', 'cart-quote-woocommerce-email'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        // Container
+        $this->add_control(
+            'cart_summary_bg_color',
+            [
+                'label' => __('Background Color', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-cart-summary' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'cart_summary_padding',
+            [
+                'label' => __('Padding', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em'],
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-cart-summary' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'cart_summary_border_radius',
+            [
+                'label' => __('Border Radius', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%'],
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-cart-summary' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        // Parent Item Style
+        $this->add_control(
+            'parent_item_heading',
+            [
+                'label' => __('Parent Item Style', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name' => 'parent_item_typography',
+                'selector' => '{{WRAPPER}} .cart-quote-parent-item .item-name',
+            ]
+        );
+
+        $this->add_control(
+            'parent_item_color',
+            [
+                'label' => __('Text Color', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#1a1a1a',
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-parent-item .item-name' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'parent_item_font_weight',
+            [
+                'label' => __('Font Weight', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'default' => '600',
+                'options' => [
+                    'normal' => __('Normal (400)', 'cart-quote-woocommerce-email'),
+                    '500' => __('Medium (500)', 'cart-quote-woocommerce-email'),
+                    '600' => __('Semi-Bold (600)', 'cart-quote-woocommerce-email'),
+                    '700' => __('Bold (700)', 'cart-quote-woocommerce-email'),
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-parent-item' => 'font-weight: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'parent_item_qty_color',
+            [
+                'label' => __('Quantity Color', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#666666',
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-parent-item .item-qty' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        // Tier Item Style
+        $this->add_control(
+            'tier_item_heading',
+            [
+                'label' => __('Tier Item Style', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name' => 'tier_item_typography',
+                'selector' => '{{WRAPPER}} .cart-quote-tier-item .item-name',
+            ]
+        );
+
+        $this->add_control(
+            'tier_item_color',
+            [
+                'label' => __('Text Color', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#666666',
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-tier-item .item-name' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'tier_item_indent',
+            [
+                'label' => __('Indentation', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 50,
+                        'step' => 1,
+                    ],
+                    'em' => [
+                        'min' => 0,
+                        'max' => 3,
+                        'step' => 0.1,
+                    ],
+                ],
+                'default' => [
+                    'size' => 16,
+                    'unit' => 'px',
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-tier-item' => 'padding-left: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        // Separator Style
+        $this->add_control(
+            'separator_heading',
+            [
+                'label' => __('Separator Style', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'separator_color',
+            [
+                'label' => __('Separator Color', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#f0f0f0',
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-item-separator' => 'background: linear-gradient(to right, transparent, {{VALUE}}, transparent);',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'separator_height',
+            [
+                'label' => __('Separator Height', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 1,
+                        'max' => 5,
+                        'step' => 1,
+                    ],
+                ],
+                'default' => [
+                    'size' => 1,
+                    'unit' => 'px',
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-item-separator' => 'height: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'separator_margin',
+            [
+                'label' => __('Separator Spacing', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px'],
+                'default' => [
+                    'top' => 8,
+                    'right' => 0,
+                    'bottom' => 8,
+                    'left' => 0,
+                    'unit' => 'px',
+                    'isLinked' => false,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .cart-quote-item-separator' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
     }
 
     /**
@@ -488,28 +733,107 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                             <span class="cart-quote-subtotal-amount">$99.00</span>
                         </div>
                     </div>
-                <?php elseif (function_exists('WC') && WC()->cart && !WC()->cart->is_empty()) : ?>
+                <?php elseif (function_exists('WC') && WC()->cart && !WC()->cart->is_empty()) : 
+                    // Parent+tier grouping logic (same as mini-cart)
+                    $items_by_product = [];
+                    $parent_items = [];
+                    $tier_items_by_parent = [];
+                    
+                    foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+                        $product_id = $cart_item['product_id'];
+                        $items_by_product[$product_id][] = array_merge($cart_item, ['key' => $cart_item_key]);
+                    }
+                    
+                    foreach ($items_by_product as $product_id => $items) {
+                        $first_item = $items[0];
+                        $product = $first_item['data'];
+                        
+                        $parent_item = [
+                            'data' => $product,
+                            'product_id' => $product_id,
+                            'quantity' => 0,
+                            'line_total' => 0,
+                        ];
+                        
+                        foreach ($items as $item) {
+                            $parent_item['quantity'] += $item['quantity'];
+                            $parent_item['line_total'] += $item['line_total'];
+                            
+                            if (isset($item['tier_data'])) {
+                                $tier_items_by_parent[$product_id][] = $item;
+                            }
+                        }
+                        
+                        $parent_items[] = $parent_item;
+                    }
+                    
+                    $show_tier_items = isset($settings['show_tier_items']) && ($settings['show_tier_items'] === 'yes');
+                    ?>
                     <div class="cart-quote-cart-summary">
                         <h3><?php esc_html_e('Your Cart', 'cart-quote-woocommerce-email'); ?></h3>
                         <ul class="cart-quote-summary-items">
-                            <?php foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) : ?>
-                                <?php $product = $cart_item['data']; ?>
-                                <li data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>">
-                                    <span class="item-name">
-                                        <?php echo esc_html($product->get_name()); ?>
-                                    </span>
-                                    <span class="item-quantity">
-                                        <button type="button" class="cart-quote-qty-btn cart-quote-qty-minus" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>">-</button>
-                                        <input type="number" class="cart-quote-qty-input" value="<?php echo esc_attr($cart_item['quantity']); ?>" min="1" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>">
-                                        <button type="button" class="cart-quote-qty-btn cart-quote-qty-plus" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>">+</button>
-                                    </span>
-                                    <span class="item-price" data-price="<?php echo esc_attr($product->get_price()); ?>">
-                                        <?php echo wc_price($cart_item['line_total']); ?>
-                                    </span>
-                                    <button type="button" class="cart-quote-remove-btn" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>" data-product-name="<?php echo esc_attr($product->get_name()); ?>" title="<?php esc_attr_e('Remove item', 'cart-quote-woocommerce-email'); ?>">
-                                        <span class="cart-quote-remove-icon">×</span>
-                                    </button>
+                            <?php 
+                            $parent_index = 0;
+                            foreach ($parent_items as $parent_key => $parent) :
+                                $product = $parent['data'];
+                                $parent_id = $parent['product_id'];
+                                $tier_items = isset($tier_items_by_parent[$parent_id]) ? $tier_items_by_parent[$parent_id] : [];
+                            ?>
+                                <!-- Parent Item -->
+                                <li class="cart-quote-parent-item">
+                                    <span class="item-name"><?php echo esc_html($product->get_name()); ?></span>
+                                    <span class="item-qty">X<?php echo esc_html($parent['quantity']); ?></span>
+                                    <span class="item-price"><?php echo wc_price($parent['line_total']); ?></span>
                                 </li>
+                                
+                                <?php if ($show_tier_items) : ?>
+                                    <!-- Tier Items -->
+                                    <?php foreach ($tier_items as $tier_item) :
+                                        $tier_data = $tier_item['tier_data'];
+                                        $tier_label = '';
+                                        
+                                        if (!empty($tier_data['tier_level'])) {
+                                            $tier_label = esc_html__('Tier', 'cart-quote-woocommerce-email') . ' ' . esc_html($tier_data['tier_level']);
+                                            if (!empty($tier_data['description'])) {
+                                                $tier_label .= ': ' . esc_html($tier_data['description']);
+                                            } elseif (!empty($tier_data['tier_name'])) {
+                                                $tier_label .= ': ' . esc_html($tier_data['tier_name']);
+                                            }
+                                        } elseif (!empty($tier_data['description'])) {
+                                            $tier_label = esc_html($tier_data['description']);
+                                        } elseif (!empty($tier_data['tier_name'])) {
+                                            $tier_label = esc_html($tier_data['tier_name']);
+                                        }
+                                    ?>
+                                        <li class="cart-quote-tier-item" data-cart-item-key="<?php echo esc_attr($tier_item['key']); ?>">
+                                            <span class="item-name">• <?php echo $tier_label; ?></span>
+                                            <span class="item-quantity">
+                                                <button type="button" class="cart-quote-qty-btn cart-quote-qty-minus" data-cart-item-key="<?php echo esc_attr($tier_item['key']); ?>">-</button>
+                                                <input type="number" class="cart-quote-qty-input" value="<?php echo esc_attr($tier_item['quantity']); ?>" min="1" data-cart-item-key="<?php echo esc_attr($tier_item['key']); ?>">
+                                                <button type="button" class="cart-quote-qty-btn cart-quote-qty-plus" data-cart-item-key="<?php echo esc_attr($tier_item['key']); ?>">+</button>
+                                            </span>
+                                            <span class="item-price" data-price="<?php echo esc_attr($tier_item['data']->get_price()); ?>">
+                                                <?php echo wc_price($tier_item['line_total']); ?>
+                                            </span>
+                                            <button type="button" class="cart-quote-remove-btn" data-cart-item-key="<?php echo esc_attr($tier_item['key']); ?>" data-product-name="<?php echo esc_attr($tier_label); ?>" title="<?php esc_attr_e('Remove item', 'cart-quote-woocommerce-email'); ?>">
+                                                <span class="cart-quote-remove-icon">×</span>
+                                            </button>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                                
+                                <?php if (!empty($tier_items) && !$show_tier_items) : ?>
+                                    <?php foreach ($tier_items as $tier_item) : ?>
+                                        <li class="cart-quote-tier-item" data-cart-item-key="<?php echo esc_attr($tier_item['key']); ?>" style="display:none;"></li>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                                
+                                <!-- Separator -->
+                                <?php if ($parent_index < count($parent_items) - 1) : ?>
+                                    <li class="cart-quote-item-separator"></li>
+                                <?php endif; ?>
+                                
+                                <?php $parent_index++; ?>
                             <?php endforeach; ?>
                         </ul>
                         <div class="cart-quote-summary-total">
@@ -721,24 +1045,52 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
             <div class="cart-quote-cart-summary">
                 <h3><?php esc_html_e('Your Cart', 'cart-quote-woocommerce-email'); ?></h3>
                 <ul class="cart-quote-summary-items">
-                    <li data-cart-item-key="preview_1">
-                        <span class="item-name">
-                            <?php esc_html_e('Sample Product', 'cart-quote-woocommerce-email'); ?>
-                        </span>
+                    <!-- Parent Item Preview -->
+                    <li class="cart-quote-parent-item">
+                        <span class="item-name"><?php esc_html_e('Sample Product', 'cart-quote-woocommerce-email'); ?></span>
+                        <span class="item-qty">X2</span>
+                        <span class="item-price">$198.00</span>
+                    </li>
+                    <# if (settings.show_tier_items === 'yes') { #>
+                    <!-- Tier Item 1 Preview -->
+                    <li class="cart-quote-tier-item" data-cart-item-key="preview_tier_1">
+                        <span class="item-name">• <?php esc_html_e('Tier 1: Basic', 'cart-quote-woocommerce-email'); ?></span>
                         <span class="item-quantity">
-                            <button type="button" class="cart-quote-qty-btn cart-quote-qty-minus" data-cart-item-key="preview_1">-</button>
-                            <input type="number" class="cart-quote-qty-input" value="1" min="1" data-cart-item-key="preview_1" readonly>
-                            <button type="button" class="cart-quote-qty-btn cart-quote-qty-plus" data-cart-item-key="preview_1">+</button>
+                            <button type="button" class="cart-quote-qty-btn cart-quote-qty-minus">-</button>
+                            <input type="number" class="cart-quote-qty-input" value="1" min="1" readonly>
+                            <button type="button" class="cart-quote-qty-btn cart-quote-qty-plus">+</button>
                         </span>
                         <span class="item-price">$99.00</span>
-                        <button type="button" class="cart-quote-remove-btn" data-product-name="<?php esc_attr_e('Sample Product', 'cart-quote-woocommerce-email'); ?>" title="<?php esc_attr_e('Remove item', 'cart-quote-woocommerce-email'); ?>">
+                        <button type="button" class="cart-quote-remove-btn" title="<?php esc_attr_e('Remove item', 'cart-quote-woocommerce-email'); ?>">
                             <span class="cart-quote-remove-icon">×</span>
                         </button>
+                    </li>
+                    <!-- Tier Item 2 Preview -->
+                    <li class="cart-quote-tier-item" data-cart-item-key="preview_tier_2">
+                        <span class="item-name">• <?php esc_html_e('Tier 2: Premium', 'cart-quote-woocommerce-email'); ?></span>
+                        <span class="item-quantity">
+                            <button type="button" class="cart-quote-qty-btn cart-quote-qty-minus">-</button>
+                            <input type="number" class="cart-quote-qty-input" value="1" min="1" readonly>
+                            <button type="button" class="cart-quote-qty-btn cart-quote-qty-plus">+</button>
+                        </span>
+                        <span class="item-price">$99.00</span>
+                        <button type="button" class="cart-quote-remove-btn" title="<?php esc_attr_e('Remove item', 'cart-quote-woocommerce-email'); ?>">
+                            <span class="cart-quote-remove-icon">×</span>
+                        </button>
+                    </li>
+                    <# } #>
+                    <!-- Separator -->
+                    <li class="cart-quote-item-separator"></li>
+                    <!-- Second Parent Item Preview -->
+                    <li class="cart-quote-parent-item">
+                        <span class="item-name"><?php esc_html_e('Another Product', 'cart-quote-woocommerce-email'); ?></span>
+                        <span class="item-qty">X1</span>
+                        <span class="item-price">$49.00</span>
                     </li>
                 </ul>
                 <div class="cart-quote-summary-total">
                     <strong><?php esc_html_e('Subtotal:', 'cart-quote-woocommerce-email'); ?></strong>
-                    <span class="cart-quote-subtotal-amount">$99.00</span>
+                    <span class="cart-quote-subtotal-amount">$247.00</span>
                 </div>
             </div>
             <# } #>
