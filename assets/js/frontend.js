@@ -553,9 +553,9 @@ function isValidEmail(email) {
                         var $dropdown = $cart.find('.cart-quote-mini-dropdown');
                         
                         // Update count badge
-                        var $count = $toggle.find('.cart-quote-mini-count');
+                        var $count = $toggle.find('.cart-count-badge');
                         if ($count.length) {
-                            $count.text(response.data.count);
+                            $count.text('(' + response.data.count + ')');
                             if (response.data.count > 0) {
                                 $count.removeClass('cart-empty');
                             } else {
