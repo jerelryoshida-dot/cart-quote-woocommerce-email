@@ -36,3 +36,11 @@ ehthumbs.db
 wp-content/uploads/
 wp-content/upgrade/
 wp-content/cache/
+
+# Specific files that should never be committed
+AGENTS.md.new
+cart-quote-woocommerce-email-v1.0.56.zip
+cart-quote-woocommerce-email-v*.zip
+
+# Prevent creating these files again
+AGENTS.md.new
