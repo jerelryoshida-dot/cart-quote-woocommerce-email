@@ -405,7 +405,7 @@ foreach ($parent_items as $parent_key => $parent) {
 
         <?php if (!$is_empty) : ?>
             <div class="cart-quote-mini-dropdown">
-               
+                <div class="cart-quote-mini-items">
                 <?php if (!empty($parent_items)) : ?>
                     <?php
                     $parent_loop_index = 0;
@@ -575,6 +575,7 @@ foreach ($parent_items as $parent_key => $parent) {
                         <?php endif; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
+                </div>
 
                 <?php 
                 if ($debug_log) {

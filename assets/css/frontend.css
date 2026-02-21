@@ -252,10 +252,15 @@
     padding: 15px;
     z-index: 1000;
     display: none;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+    transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
-.cart-quote-mini-cart:hover .cart-quote-mini-dropdown {
+.cart-quote-mini-dropdown.active {
     display: block;
+    opacity: 1;
+    transform: translateY(0) scale(1);
 }
 
 .cart-quote-mini-items {
@@ -264,18 +269,106 @@
     padding: 0;
     max-height: 300px;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
-/* Item Base Styles - Grid Layout */
+.cart-quote-mini-items::-webkit-scrollbar {
+    width: 4px;
+}
+
+.cart-quote-mini-items::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.cart-quote-mini-items::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 2px;
+}
+
+.cart-quote-mini-items::-webkit-scrollbar-thumb:hover {
+    background: #ccc;
+}
+
+.cart-quote-mini-cart:hover .cart-quote-mini-dropdown {
+    display: block;
+}
+
+/* Close Button - Minimalist */
+.cart-quote-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #999999;
+    transition: all 0.2s ease;
+    padding: 0;
+    z-index: 1;
+}
+
+.cart-quote-close-btn:hover {
+    background: #f5f5f5;
+    color: #666666;
+    transform: rotate(90deg);
+}
+
+.cart-quote-close-btn:focus {
+    outline: 2px solid #1a1a1a;
+    outline-offset: 2px;
+}
+
+/* Empty Cart State - Minimalist */
+.cart-quote-mini-empty-state {
+    text-align: center;
+    padding: 50px 25px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.empty-cart-icon {
+    color: #d0d0d0;
+    margin-bottom: 20px;
+    opacity: 0.6;
+}
+
+.empty-cart-content h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.empty-cart-content p {
+    margin: 0 0 8px 0 24px;
+    font-size: 14px;
+    color: #666666;
+    line-height: 1.6;
+}
+}
+
+.cart-quote-mini-cart:hover .cart-quote-mini-dropdown {
+    display: block;
+}
 .cart-quote-mini-item {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
+    display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 0;
+    padding: 10px 0;
 }
 
 .cart-quote-mini-item .item-name {
+    flex: 1;
     color: #333;
     font-size: 14px;
     line-height: 1.4;
@@ -287,58 +380,61 @@
 .cart-quote-mini-item .item-qty {
     font-size: 12px;
     color: #888;
-    font-weight: 600;
-    text-transform: uppercase;
-    min-width: 25px;
+    font-weight: 500;
+    min-width: 30px;
     text-align: center;
 }
 
 .cart-quote-mini-item .item-price {
     font-weight: 600;
-    color: #0073aa;
+    color: #1a1a1a;
     font-size: 14px;
     text-align: right;
     white-space: nowrap;
+    min-width: 60px;
 }
 
-/* Parent Item Styles */
 .cart-quote-mini-item.parent-item {
-    padding: 10px 0 6px 0;
+    padding: 12px 0 8px 0;
+    border-bottom: none;
 }
 
 .cart-quote-mini-item.parent-item .item-name {
-    color: #333;
+    color: #1a1a1a;
     font-weight: 600;
     font-size: 14px;
 }
 
 .cart-quote-mini-item.parent-item .item-qty {
     color: #666;
-    font-size: 12px;
 }
 
-/* Tier Item Styles */
 .cart-quote-mini-item.tier-item {
-    padding: 4px 0 8px 0;
+    padding: 6px 0 6px 16px;
+    background: none;
 }
 
 .cart-quote-mini-item.tier-item .item-name {
     color: #666;
     font-size: 13px;
     font-weight: 400;
-    padding-left: 0;
 }
 
 .cart-quote-mini-item.tier-item .item-qty {
-    color: #888;
-    font-size: 12px;
+    color: #999;
+    font-size: 11px;
 }
 
-/* Separator Line */
+.cart-quote-mini-item.tier-item .item-price {
+    color: #666;
+    font-weight: 500;
+    font-size: 13px;
+}
+
 .cart-quote-item-separator {
     height: 1px;
-    background: linear-gradient(to right, transparent, #ddd, transparent);
-    margin: 4px 0 8px 0;
+    background: #f0f0f0;
+    margin: 8px 0;
 }
 
 /* Legacy Tier Badge - Pill Style (kept for compatibility) */
