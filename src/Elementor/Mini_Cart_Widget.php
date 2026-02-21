@@ -1875,13 +1875,15 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
         
         $this->end_controls_section();
 
+    }
+
         /**
          * Render widget
          *
          * @return void
          */
         protected function render()
-    {
+        {
         $settings = $this->get_settings_for_display();
         
         // Get toggle mode setting
