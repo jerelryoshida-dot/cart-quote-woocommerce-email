@@ -178,59 +178,43 @@
     cursor: pointer;
 }
 
-/* Toggle Button - Minimalist */
+/* Toggle Button */
 .cart-quote-mini-toggle {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 8px 16px;
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    gap: 12px;
+    padding: 5px 0;
+    transition: background 0.2s ease;
 }
 
 .cart-quote-mini-toggle:hover {
-    background: #fafafa;
-    border-color: #d0d0d0;
-}
-
-.cart-quote-mini-toggle.active {
-    background: #ffffff;
-    border-color: #1a1a1a;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+    opacity: 0.9;
 }
 
 .cart-quote-toggle-icon {
-    font-size: 16px;
-    color: #1a1a1a;
-    transition: color 0.2s ease;
-}
-
-.cart-quote-mini-toggle:hover .cart-quote-toggle-icon {
-    color: #1a1a1a;
+    font-size: 20px;
+    color: #333;
 }
 
 .cart-quote-label {
-    font-weight: 500;
+    font-weight: 600;
     font-size: 14px;
-    color: #1a1a1a;
+    color: #333;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
 }
 
 .cart-count-badge {
-    font-weight: 600;
-    color: #1a1a1a;
+    font-weight: 700;
+    color: #333;
 }
 
 .cart-quote-mini-subtotal {
     margin-left: auto;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 14px;
-    color: #1a1a1a;
+    color: #0073aa;
 }
 
 /* Legacy count badge (for compatibility) */
@@ -255,17 +239,17 @@
     display: none;
 }
 
-/* Mini Cart Dropdown - Minimalist */
+/* Mini Cart Dropdown */
 .cart-quote-mini-dropdown {
     position: absolute;
     top: 100%;
     right: 0;
     width: 320px;
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    padding: 20px;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    padding: 15px;
     z-index: 1000;
     display: none;
     opacity: 0;
@@ -281,152 +265,28 @@
 
 .cart-quote-mini-items {
     list-style: none;
-    margin: 0 0 20px;
+    margin: 0 0 15px;
     padding: 0;
-    max-height: 400px;
+    max-height: 300px;
     overflow-y: auto;
-    scrollbar-width: 6px;
-    scrollbar-color: #f5f5f5 #e0e0e0;
+    overflow-x: hidden;
 }
 
 .cart-quote-mini-items::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 
 .cart-quote-mini-items::-webkit-scrollbar-track {
-    background: #fafafa;
+    background: transparent;
 }
 
 .cart-quote-mini-items::-webkit-scrollbar-thumb {
-    background: #dddddd;
-    border-radius: 3px;
+    background: #e0e0e0;
+    border-radius: 2px;
 }
 
 .cart-quote-mini-items::-webkit-scrollbar-thumb:hover {
-    background: #bbbbbb;
-}
-
-.cart-quote-mini-items::-webkit-scrollbar-corner {
-    background: #fafafa;
-}
-
-.cart-quote-mini-items::-moz-scrollbar {
-    width: 6px;
-}
-
-.cart-quote-mini-items::-moz-scrollbar-track {
-    background: #fafafa;
-}
-
-.cart-quote-mini-items::-moz-scrollbar-thumb {
-    background: #dddddd;
-    border-radius: 3px;
-}
-
-.cart-quote-mini-items::-moz-scrollbar-corner {
-    background: #fafafa;
-}
-
-/* Item Base Styles - Minimalist Grid */
-.cart-quote-mini-item {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: center;
-    gap: 16px;
-    padding: 14px 10px;
-    border-radius: 4px;
-    transition: background 0.2s ease, transform 0.15s ease;
-}
-
-.cart-quote-mini-item:hover {
-    background: #fafafa;
-    transform: translateX(2px);
-}
-
-.cart-quote-mini-item .item-name {
-    color: #1a1a1a;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.5;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.cart-quote-mini-item .item-qty {
-    font-size: 11px;
-    color: #888888;
-    font-weight: 500;
-    text-transform: none;
-    min-width: 28px;
-    text-align: center;
-}
-
-.cart-quote-mini-item .item-price {
-    font-weight: 600;
-    color: #1a1a1a;
-    font-size: 14px;
-    text-align: right;
-    white-space: nowrap;
-}
-
-/* Parent Item Styles - Minimalist */
-.cart-quote-mini-item.parent-item {
-    background: #ffffff;
-    border: 1px solid #f0f0f0;
-    padding: 14px 10px;
-    border-radius: 4px;
-}
-
-.cart-quote-mini-item.parent-item .item-name {
-    color: #000000;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.cart-quote-mini-item.parent-item .item-qty {
-    color: #666666;
-    font-size: 11px;
-}
-
-.cart-quote-mini-item.parent-item .item-price {
-    font-weight: 600;
-    color: #1a1a1a;
-    font-size: 14px;
-    text-align: right;
-}
-
-/* Tier Item Styles - Minimalist */
-.cart-quote-mini-item.tier-item {
-    background: transparent;
-    padding: 8px 10px 16px;
-}
-
-.cart-quote-mini-item.tier-item .item-name {
-    color: #666666;
-    font-size: 13px;
-    font-weight: 400;
-    padding-left: 12px;
-}
-
-.cart-quote-mini-item.tier-item .item-qty {
-    color: #999999;
-    font-size: 11px;
-}
-
-.cart-quote-mini-item .item-price {
-    font-weight: 500;
-    color: #1a1a1a;
-    font-size: 13px;
-    text-align: right;
-}
-
-/* Separator - Minimalist */
-.cart-quote-item-separator {
-    height: 1px;
-    background: #f0f0f0;
-    margin: 12px 0;
-    opacity: 0.5;
+    background: #ccc;
 }
 
 .cart-quote-mini-cart:hover .cart-quote-mini-dropdown {
@@ -495,25 +355,20 @@
     color: #666666;
     line-height: 1.6;
 }
-
-.cart-quote-mini-items {
-    list-style: none;
-    margin: 0 0 15px;
-    padding: 0;
-    max-height: 300px;
-    overflow-y: auto;
 }
 
-/* Item Base Styles - Grid Layout */
+.cart-quote-mini-cart:hover .cart-quote-mini-dropdown {
+    display: block;
+}
 .cart-quote-mini-item {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
+    display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 0;
+    padding: 10px 0;
 }
 
 .cart-quote-mini-item .item-name {
+    flex: 1;
     color: #333;
     font-size: 14px;
     line-height: 1.4;
@@ -525,58 +380,61 @@
 .cart-quote-mini-item .item-qty {
     font-size: 12px;
     color: #888;
-    font-weight: 600;
-    text-transform: uppercase;
-    min-width: 25px;
+    font-weight: 500;
+    min-width: 30px;
     text-align: center;
 }
 
 .cart-quote-mini-item .item-price {
     font-weight: 600;
-    color: #0073aa;
+    color: #1a1a1a;
     font-size: 14px;
     text-align: right;
     white-space: nowrap;
+    min-width: 60px;
 }
 
-/* Parent Item Styles */
 .cart-quote-mini-item.parent-item {
-    padding: 10px 0 6px 0;
+    padding: 12px 0 8px 0;
+    border-bottom: none;
 }
 
 .cart-quote-mini-item.parent-item .item-name {
-    color: #333;
+    color: #1a1a1a;
     font-weight: 600;
     font-size: 14px;
 }
 
 .cart-quote-mini-item.parent-item .item-qty {
     color: #666;
-    font-size: 12px;
 }
 
-/* Tier Item Styles */
 .cart-quote-mini-item.tier-item {
-    padding: 4px 0 8px 0;
+    padding: 6px 0 6px 16px;
+    background: none;
 }
 
 .cart-quote-mini-item.tier-item .item-name {
     color: #666;
     font-size: 13px;
     font-weight: 400;
-    padding-left: 0;
 }
 
 .cart-quote-mini-item.tier-item .item-qty {
-    color: #888;
-    font-size: 12px;
+    color: #999;
+    font-size: 11px;
 }
 
-/* Separator Line */
+.cart-quote-mini-item.tier-item .item-price {
+    color: #666;
+    font-weight: 500;
+    font-size: 13px;
+}
+
 .cart-quote-item-separator {
     height: 1px;
-    background: linear-gradient(to right, transparent, #ddd, transparent);
-    margin: 4px 0 8px 0;
+    background: #f0f0f0;
+    margin: 8px 0;
 }
 
 /* Legacy Tier Badge - Pill Style (kept for compatibility) */
@@ -677,8 +535,6 @@
 .cart-quote-mini-actions {
     display: flex;
     gap: 10px;
-    padding-top: 20px;
-    border-top: 1px solid #f0f0f0;
 }
 
 .cart-quote-mini-btn {
@@ -686,55 +542,6 @@
     display: block;
     text-align: center;
     text-decoration: none;
-    padding: 12px 20px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 13px;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-}
-
-.cart-quote-mini-btn:hover {
-    transform: translateY(-1px);
-}
-
-/* Primary Button - Get Quote */
-.cart-quote-mini-btn.get-quote {
-    background: #1a1a1a;
-    color: #ffffff;
-    border-color: #1a1a1a;
-}
-
-.cart-quote-mini-btn.get-quote:hover {
-    background: #000000;
-    border-color: #000000;
-}
-
-.cart-quote-mini-btn.get-quote:focus {
-    outline: 2px solid #1a1a1a;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.2);
-}
-
-/* Secondary Button - View Cart */
-.cart-quote-mini-btn.view-cart {
-    background: #ffffff;
-    color: #1a1a1a;
-    border-color: #e0e0e0;
-}
-
-.cart-quote-mini-btn.view-cart:hover {
-    background: #fafafa;
-    border-color: #d0d0d0;
-}
-
-.cart-quote-mini-btn.view-cart:focus {
-    outline: 2px solid #1a1a1a;
-    outline-offset: 2px;
-}
-
-.cart-quote-mini-actions .cart-quote-mini-btn:active {
-    transform: translateY(0);
 }
 
 /* Quote Form Styles */
@@ -1297,75 +1104,7 @@
     color: #666;
 }
 
-/* Responsive Styles - Mini Cart */
-@media (max-width: 992px) {
-    .cart-quote-mini-dropdown {
-        width: 380px;
-        right: 0;
-    }
-}
-
-@media (max-width: 768px) {
-    .cart-quote-mini-dropdown {
-        width: calc(100vw - 30px);
-        left: 15px;
-        right: 15px;
-        max-width: 400px;
-        padding: 16px;
-    }
-    
-    .cart-quote-mini-item {
-        gap: 12px;
-        padding: 12px 8px;
-    }
-    
-    .cart-quote-mini-actions {
-        gap: 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .cart-quote-mini-dropdown {
-        width: calc(100vw - 20px);
-        max-height: 65vh;
-        padding: 12px;
-        left: 10px;
-        right: 10px;
-    }
-    
-    .cart-quote-mini-item {
-        grid-template-columns: 1fr auto;
-        gap: 10px;
-        padding: 10px 6px;
-    }
-    
-    .cart-quote-item-separator {
-        margin: 10px 0;
-    }
-    
-    .cart-quote-mini-actions {
-        flex-direction: column;
-        padding-top: 16px;
-        gap: 8px;
-    }
-    
-    .cart-quote-mini-btn {
-        width: 100%;
-        padding: 14px 16px;
-    }
-    
-    .cart-quote-mini-toggle {
-        padding: 6px 12px;
-    }
-    
-    .cart-quote-close-btn {
-        width: 28px;
-        height: 28px;
-        top: 8px;
-        right: 8px;
-    }
-}
-
+/* Responsive Styles */
 @media (max-width: 768px) {
     .cart-quote-table th,
     .cart-quote-table td {

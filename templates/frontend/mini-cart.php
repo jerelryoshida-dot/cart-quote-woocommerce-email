@@ -240,7 +240,7 @@ if ($debug_log) {
 
         <?php if (!$is_empty) : ?>
             <div class="cart-quote-mini-dropdown">
-               
+                <div class="cart-quote-mini-items">
                 <?php if (!empty($parent_items)) : ?>
                     <?php
                     $parent_loop_index = 0;
@@ -414,6 +414,7 @@ if ($debug_log) {
                         <?php endif; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
+                </div>
 
                 <?php 
                 if ($debug_log) {
