@@ -4,7 +4,7 @@ Tags: woocommerce, quote, cart, email, google calendar, elementor
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 1.0.57
+Stable tag: 1.0.58
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -118,6 +118,16 @@ Yes. Google OAuth tokens are encrypted before storage. All database queries use 
 6. Elementor widgets
 
 == Changelog ==
+
+= 1.0.58 =
+* **Security**: Fixed critical vulnerability - URL parameter bypass removed
+* **Security**: Debug mode now exclusively controlled by admin setting
+* **Security**: Added capability check - only admins can see debug output
+* **Security**: Debug now requires WP_DEBUG to be enabled in wp-config.php
+* **Security**: Added clear security warnings in settings panel
+* **Removed**: Redundant inline debug output from mini-cart dropdown (-91 lines)
+* **Improved**: Enhanced debug settings documentation with requirements
+* **Improved**: Added unified helper methods for debug checks (is_debug_mode_active, is_debug_logging_active)
 
 = 1.0.57 =
 * **Fixed**: Mini-cart now correctly displays selected tier level from WCGM marketplace
