@@ -294,53 +294,55 @@ if ($debug_log) {
                             <span class="item-qty">X<?php echo esc_html($parent['quantity']); ?></span>
                             <span class="item-price"><?php echo wc_price($parent['line_total']); ?></span>
                         </div>
-                        
-                        <?php 
-                        $tier_loop_index = 0;
-                        foreach ($tier_items as $tier) : 
-                            $tier_data = $tier['tier_data'];
-                            $tier_label = '';
-                            
-                            if (!empty($tier_data['tier_level'])) {
-                                $tier_label = esc_html__('Tier', 'cart-quote-woocommerce-email') . ' ' . esc_html($tier_data['tier_level']);
-                                if (!empty($tier_data['description'])) {
-                                    $tier_label .= ': ' . esc_html($tier_data['description']);
-                                } elseif (!empty($tier_data['tier_name'])) {
-                                    $tier_label .= ': ' . esc_html($tier_data['tier_name']);
-                                }
-                            } elseif (!empty($tier_data['description'])) {
-                                $tier_label = esc_html($tier_data['description']);
-                            } elseif (!empty($tier_data['tier_name'])) {
-                                $tier_label = esc_html($tier_data['tier_name']);
-                            }
-                            
-                            if ($debug_log) {
-                                error_log('    TIER ITEM [' . $tier_loop_index . ']');
-                                error_log('      tier_level: "' . ($tier_data['tier_level'] ?? 'NULL') . '"');
-                                error_log('      description: "' . ($tier_data['description'] ?? 'NULL') . '"');
-                                error_log('      Display label: "' . $tier_label . '"');
-                                error_log('');
-                            }
 
-                            if ($debug_enabled) {
-                                $console_tier = [
-                                    'tier_data' => $tier_data,
-                                    'selected_tier' => $tier['selected_tier'] ?? null,
-                                    'quantity' => $tier['quantity'] ?? 0,
-                                    'line_total' => $tier['line_total'] ?? 0,
-                                ];
-                                echo '<script>if(typeof MiniCartLogger!=="undefined"){MiniCartLogger.logTierDisplay(' . json_encode($console_tier, JSON_HEX_TAG) . ',' . json_encode($tier_label, JSON_HEX_TAG) . ');}</script>';
-                            }
-                            
-                            $tier_loop_index++;
-                            ?>
-                            
-                            <div class="cart-quote-mini-item tier-item">
-                                <span class="item-name">• <?php echo $tier_label; ?></span>
-                                <span class="item-qty">X<?php echo esc_html($tier['quantity']); ?></span>
-                                <span class="item-price"><?php echo wc_price($tier['line_total']); ?></span>
-                            </div>
-                        <?php endforeach; ?>
+                        <?php
+                        if (isset($atts['show_tier_items']) && ($atts['show_tier_items'] === 'true' || $atts['show_tier_items'] === 'yes')) :
+                            $tier_loop_index = 0;
+                            foreach ($tier_items as $tier) :
+                                $tier_data = $tier['tier_data'];
+                                $tier_label = '';
+
+                                if (!empty($tier_data['tier_level'])) {
+                                    $tier_label = esc_html__('Tier', 'cart-quote-woocommerce-email') . ' ' . esc_html($tier_data['tier_level']);
+                                    if (!empty($tier_data['description'])) {
+                                        $tier_label .= ': ' . esc_html($tier_data['description']);
+                                    } elseif (!empty($tier_data['tier_name'])) {
+                                        $tier_label .= ': ' . esc_html($tier_data['tier_name']);
+                                    }
+                                } elseif (!empty($tier_data['description'])) {
+                                    $tier_label = esc_html($tier_data['description']);
+                                } elseif (!empty($tier_data['tier_name'])) {
+                                    $tier_label = esc_html($tier_data['tier_name']);
+                                }
+
+                                if ($debug_log) {
+                                    error_log('    TIER ITEM [' . $tier_loop_index . ']');
+                                    error_log('      tier_level: "' . ($tier_data['tier_level'] ?? 'NULL') . '"');
+                                    error_log('      description: "' . ($tier_data['description'] ?? 'NULL') . '"');
+                                    error_log('      Display label: "' . $tier_label . '"');
+                                    error_log('');
+                                }
+
+                                if ($debug_enabled) {
+                                    $console_tier = [
+                                        'tier_data' => $tier_data,
+                                        'selected_tier' => $tier['selected_tier'] ?? null,
+                                        'quantity' => $tier['quantity'] ?? 0,
+                                        'line_total' => $tier['line_total'] ?? 0,
+                                    ];
+                                    echo '<script>if(typeof MiniCartLogger!=="undefined"){MiniCartLogger.logTierDisplay(' . json_encode($console_tier, JSON_HEX_TAG) . ',' . json_encode($tier_label, JSON_HEX_TAG) . ');}</script>';
+                                }
+
+                                $tier_loop_index++;
+                                ?>
+
+                                <div class="cart-quote-mini-item tier-item">
+                                    <span class="item-name">• <?php echo $tier_label; ?></span>
+                                    <span class="item-qty">X<?php echo esc_html($tier['quantity']); ?></span>
+                                    <span class="item-price"><?php echo wc_price($tier['line_total']); ?></span>
+                                </div>
+                            <?php endforeach;
+                        endif; ?>
                         
                         <?php 
                         $show_separator = $parent_key < count($parent_items) - 1;
@@ -366,10 +368,10 @@ if ($debug_log) {
                         error_log('');
                     }
                     
-                    foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) : 
+                    foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) :
                         $product = $cart_item['data'];
                         $tier_data = isset($cart_item['tier_data']) ? $cart_item['tier_data'] : null;
-                        
+
                         $tier_label = '';
                         if ($tier_data) {
                             if (!empty($tier_data['tier_level'])) {
@@ -385,7 +387,7 @@ if ($debug_log) {
                                 $tier_label = esc_html($tier_data['tier_name']);
                             }
                         }
-                        
+
                         if ($debug_log) {
                             error_log('    FALLBACK ITEM:');
                             error_log('      Product: "' . $product->get_name() . '"');
@@ -395,14 +397,16 @@ if ($debug_log) {
                             error_log('');
                         }
                         ?>
-                        
-                        <?php if ($tier_label) : ?>
+
+                        <?php
+                        $show_tier_items = isset($atts['show_tier_items']) && ($atts['show_tier_items'] === 'true' || $atts['show_tier_items'] === 'yes');
+                        if ($tier_label && $show_tier_items) : ?>
                             <div class="cart-quote-mini-item tier-item">
                                 <span class="item-name">• <?php echo $tier_label; ?></span>
                                 <span class="item-qty">X<?php echo esc_html($cart_item['quantity']); ?></span>
                                 <span class="item-price"><?php echo wc_price($cart_item['line_total']); ?></span>
                             </div>
-                        <?php else : ?>
+                        <?php elseif (!$tier_data) : ?>
                             <div class="cart-quote-mini-item">
                                 <span class="item-name"><?php echo esc_html($product->get_name()); ?></span>
                                 <span class="item-qty">X<?php echo esc_html($cart_item['quantity']); ?></span>

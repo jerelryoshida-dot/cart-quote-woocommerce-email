@@ -98,6 +98,7 @@ class Frontend_Manager
         $atts = shortcode_atts([
             'show_subtotal' => 'true',
             'show_count' => 'true',
+            'show_tier_items' => 'true',
         ], $atts);
 
         ob_start();
