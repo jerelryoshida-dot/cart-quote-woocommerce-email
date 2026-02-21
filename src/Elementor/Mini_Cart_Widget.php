@@ -1762,19 +1762,118 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
                 ],
             ]
         );
-
+        
+        // Toggle Behavior Section
+        $this->start_controls_section(
+            'toggle_behavior_section',
+            [
+                'label' => __('Toggle Behavior', 'cart-quote-woocommerce-email'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+        
+        $this->add_control(
+            'toggle_mode',
+            [
+                'label' => __('Toggle Mode', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'default' => 'click',
+                'options' => [
+                    'click' => __('Click', 'cart-quote-woocommerce-email'),
+                    'hover' => __('Hover', 'cart-quote-woocommerce-email'),
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'auto_close_delay',
+            [
+                'label' => __('Auto-Close Delay (seconds)', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'default' => '5',
+                'size_units' => ['s'],
+                'range' => [
+                    's' => [
+                        'min' => 0,
+                        'max' => 10,
+                        'step' => 1,
+                    ],
+                ],
+                'condition' => [
+                    'toggle_mode' => 'click',
+                ],
+            ]
+        );
+        
         $this->end_controls_section();
-    }
+        
+        // Empty Cart Section
+        $this->start_controls_section(
+            'empty_cart_style_section',
+            [
+                'label' => __('Empty Cart Style', 'cart-quote-woocommerce-email'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+        
+        $this->add_control(
+            'empty_cart_text',
+            [
+                'label' => __('Empty Cart Text', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('Your cart is empty', 'cart-quote-woocommerce-email'),
+            ]
+        );
+        
+        $this->add_control(
+            'empty_cart_subtext',
+            [
+                'label' => __('Empty Cart Subtext', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('Add items to get started', 'cart-quote-woocommerce-email'),
+            ]
+        );
+        
+        $this->end_controls_section();
+        
+        // Close Button Section
+        $this->start_controls_section(
+            'close_button_section',
+            [
+                'label' => __('Close Button', 'cart-quote-woocommerce-email'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+        
+        $this->add_control(
+            'show_close_button',
+            [
+                'label' => __('Show Close Button', 'cart-quote-woocommerce-email'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'cart-quote-woocommerce-email'),
+                'label_off' => __('No', 'cart-quote-woocommerce-email'),
+                'default' => 'yes',
+            ]
+        );
+        
+        $this->end_controls_section();
 
-    /**
-     * Render widget
-     *
-     * @return void
-     */
-    protected function render()
+        /**
+         * Render widget
+         *
+         * @return void
+         */
+        protected function render()
     {
         $settings = $this->get_settings_for_display();
-
+        
+        // Get toggle mode setting
+        $toggle_mode = isset($settings['toggle_mode']) ? $settings['toggle_mode'] : 'click';
+        
+        // Get empty cart settings
+        $empty_cart_text = isset($settings['empty_cart_text']) ? $settings['empty_cart_text'] : __('Your cart is empty', 'cart-quote-woocommerce-email');
+        $empty_cart_subtext = isset($settings['empty_cart_subtext']) ? $settings['empty_cart_subtext'] : __('Add items to get started', 'cart-quote-woocommerce-email');
+        
         // Check if we're in Elementor editor
         $is_editor = \Elementor\Plugin::$instance->editor->is_edit_mode();
 
@@ -1806,12 +1905,21 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
                     <?php endif; ?>
                 </div>
 
-                <?php if ($settings['show_items_list'] === 'yes') : ?>
+                 <?php if ($settings['show_items_list'] === 'yes') : ?>
                     <div class="cart-quote-mini-dropdown">
                         <?php if ($is_empty && !$is_editor) : ?>
-                            <p class="cart-quote-mini-empty">
-                                <?php esc_html_e('Your cart is empty.', 'cart-quote-woocommerce-email'); ?>
-                            </p>
+                            <div class="cart-quote-mini-empty-state">
+                                <div class="empty-cart-icon">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                <path d="M3 3h2l8 4-8 4v2a2 2 0 012 2h12a2 2 0 012-2v-2a2 2 0 01-2 2z"/>
+                                                <circle cx="9" cy="9" r="2"/>
+                                    </svg>
+                                </div>
+                                <div class="empty-cart-content">
+                                    <h3><?php echo esc_html($empty_cart_text); ?></h3>
+                                    <p><?php echo esc_html($empty_cart_subtext); ?></p>
+                                </div>
+                            </div>
                         <?php else : ?>
                             <?php if ($is_editor && $is_empty) : ?>
                                 <div class="cart-quote-editor-notice" style="background:#fff3cd;padding:8px;margin-bottom:10px;border-radius:4px;font-size:11px;">

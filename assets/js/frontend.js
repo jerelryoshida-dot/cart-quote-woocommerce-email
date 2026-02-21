@@ -573,9 +573,21 @@ function isValidEmail(email) {
                         if (fullRefresh) {
                             if (response.data.is_empty) {
                                 // Show empty cart message
-                                $dropdown.html('<p class="cart-quote-mini-empty">' + 
-                                    (cartQuoteFrontend.i18n && cartQuoteFrontend.i18n.emptyCart ? cartQuoteFrontend.i18n.emptyCart : 'Your cart is empty.') + 
-                                    '</p>');
+                                var emptyCartHTML = `
+                                    <div class="cart-quote-mini-empty-state">
+                                        <div class="empty-cart-icon">
+                                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                <path d="M3 3h2l8 4-8 4v2a2 2 0 012 2h12a2 2 0 012-2v-2a2 2 0 01-2 2z"/>
+                                                <circle cx="9" cy="9" r="2"/>
+                                            </svg>
+                                        </div>
+                                        <div class="empty-cart-content">
+                                            <h3>Your cart is empty</h3>
+                                            <p>Add items to get started</p>
+                                        </div>
+                                    </div>
+                                `;
+                                $dropdown.html(emptyCartHTML);
                             } else {
                                 // Rebuild items list
                                 var $itemsList = $dropdown.find('.cart-quote-mini-items');
@@ -664,5 +676,55 @@ function isValidEmail(email) {
             }
         });
     };
+    
+    // Click toggle functionality
+    var miniCartOpen = false;
+    var miniCartTimer = null;
+    
+    $('.cart-quote-mini-cart').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        var $this = $(this);
+        var $dropdown = $this.find('.cart-quote-mini-dropdown');
+        
+        miniCartOpen = !miniCartOpen;
+        
+        if (miniCartOpen) {
+            $this.addClass('active');
+            $dropdown.addClass('active');
+            
+            clearTimeout(miniCartTimer);
+            miniCartTimer = setTimeout(function() {
+                if (miniCartOpen) {
+                    closeMiniCart();
+                }
+            }, 5000);
+        } else {
+            closeMiniCart();
+        }
+    });
+    
+    // Close when clicking outside
+    $(document).on('click.mini-cart', function(e) {
+        if ($(e.target).closest('.cart-quote-mini-cart').length === 0) {
+            closeMiniCart();
+        }
+    });
+    
+    // Close function
+    function closeMiniCart() {
+        clearTimeout(miniCartTimer);
+        miniCartOpen = false;
+        $('.cart-quote-mini-cart').removeClass('active');
+        $('.cart-quote-mini-dropdown').removeClass('active');
+    }
+    
+    // Close on ESC key
+    $(document).on('keydown.mini-cart', function(e) {
+        if (e.key === 'Escape' && miniCartOpen) {
+            closeMiniCart();
+        }
+    });
 
 })(jQuery);
