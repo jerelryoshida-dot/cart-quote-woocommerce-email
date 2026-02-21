@@ -354,6 +354,17 @@ cart-quote-woocommerce-email/
 
 ## Changelog
 
+### 1.0.58
+- Security: Removed URL parameter activation for mini-cart debug
+- Security: Debug mode now exclusively controlled by admin setting
+- Security: Added capability check - only admins can see debug output
+- Security: Fixed vulnerability that exposed cart data publicly
+- Security: Debug now requires WP_DEBUG to be enabled in wp-config.php
+- Security: Added clear security warnings in settings panel
+- Removed: Redundant inline debug output from mini-cart dropdown
+- Improved: Enhanced debug settings documentation with requirements
+- Improved: Added unified helper methods for debug checks
+
 ### 1.0.57
 - Fixed: Mini-cart now correctly displays selected tier level from WCGM marketplace
 - Fixed: Tier detection checks multiple field names (selected_tier, tier_level, welp_selected_tier, tier)

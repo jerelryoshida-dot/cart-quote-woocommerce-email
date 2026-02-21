@@ -3,6 +3,9 @@
  *
  * Sends structured debug data to browser console for troubleshooting tier display issues.
  *
+ * SECURITY: Debug mode is controlled by admin setting (cart_quote_wc_debug_mini_cart),
+ * requires WP_DEBUG to be enabled, and user must have 'manage_options' capability.
+ *
  * @package CartQuoteWooCommerce
  * @since 1.0.54
  */
@@ -14,9 +17,9 @@
         enabled: false,
 
         init: function() {
-            this.enabled = window.cartQuoteDebugMiniCart === true ||
-                         window.location.search.indexOf('debug_mini_cart=1') !== -1 ||
-                         window.location.search.indexOf('debug_cart=1') !== -1;
+            // Debug is controlled by server-side setting and capability check
+            // Only enabled when: cart_quote_wc_debug_mini_cart=yes, WP_DEBUG=true, admin user
+            this.enabled = window.cartQuoteDebugMiniCart === true;
 
             if (this.enabled) {
                 this.log('LOGGER_INIT', {

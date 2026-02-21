@@ -183,11 +183,27 @@ if (!defined('ABSPATH')) {
                                 </select>
                             </label>
                             <p class="description">
-                                <?php esc_html_e('Enable detailed debug logging for mini-cart tier data. Logs will be written to wp-content/debug.log when WP_DEBUG and WP_DEBUG_LOG are also enabled in wp-config.php.', 'cart-quote-woocommerce-email'); ?>
+                                <?php esc_html_e('Enable detailed debug logging for mini-cart tier data. Debug information will be displayed in browser console and on page when enabled.', 'cart-quote-woocommerce-email'); ?>
                             </p>
-                            <p class="description" style="color: #d63638;">
-                                <strong><?php esc_html_e('Note:', 'cart-quote-woocommerce-email'); ?></strong>
-                                <?php esc_html_e('This logs all cart item data including tier information. Disable when not debugging.', 'cart-quote-woocommerce-email'); ?>
+                            <p class="description">
+                                <strong><?php esc_html_e('Requirements:', 'cart-quote-woocommerce-email'); ?></strong>
+                                <ul style="margin-top: 5px; padding-left: 20px;">
+                                    <li><?php esc_html_e('<code>WP_DEBUG</code> must be set to <code>true</code> in wp-config.php', 'cart-quote-woocommerce-email'); ?></li>
+                                    <li><?php esc_html_e('User must have <code>manage_options</code> capability (administrator)', 'cart-quote-woocommerce-email'); ?></li>
+                                    <li><?php esc_html_e('<code>WP_DEBUG_LOG</code> must be set to <code>true</code> for file logging', 'cart-quote-woocommerce-email'); ?></li>
+                                </ul>
+                            </p>
+                            <p class="description" style="color: #d63638; background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107;">
+                                <strong><?php esc_html_e('⚠️ Security Warning:', 'cart-quote-woocommerce-email'); ?></strong><br>
+                                <?php esc_html_e('When enabled, debug information may be visible to administrators in browser console and on page. This should only be enabled during development or troubleshooting. <strong>Disable in production.</strong>', 'cart-quote-woocommerce-email'); ?>
+                            </p>
+                            <p class="description">
+                                <strong><?php esc_html_e('What gets logged:', 'cart-quote-woocommerce-email'); ?></strong>
+                                <ul style="margin-top: 5px; padding-left: 20px;">
+                                    <li><?php esc_html_e('Console logging: Cart item data, tier information, filtering logic (browser console)', 'cart-quote-woocommerce-email'); ?></li>
+                                    <li><?php esc_html_e('Visual panel: Debug output displayed on page (green text on black)', 'cart-quote-woocommerce-email'); ?></li>
+                                    <li><?php esc_html_e('File logging: All debug data written to wp-content/debug.log (when WP_DEBUG_LOG is enabled)', 'cart-quote-woocommerce-email'); ?></li>
+                                </ul>
                             </p>
                         </td>
                     </tr>

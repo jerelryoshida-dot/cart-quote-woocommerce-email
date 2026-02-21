@@ -223,6 +223,36 @@ class Settings
         return get_option('cart_quote_wc_debug_mini_cart', 'no') === 'yes';
     }
 
+    /**
+     * Is debug mode active for current user?
+     *
+     * Combines setting check, WP_DEBUG, and user capability.
+     * This is single point of truth for debug activation.
+     *
+     * @return bool
+     */
+    public static function is_debug_mode_active(): bool
+    {
+        return self::is_debug_mini_cart_enabled() &&
+               defined('\WP_DEBUG') &&
+               \WP_DEBUG &&
+               current_user_can('manage_options');
+    }
+
+    /**
+     * Is debug logging to file active?
+     *
+     * Adds WP_DEBUG_LOG requirement to check.
+     *
+     * @return bool
+     */
+    public static function is_debug_logging_active(): bool
+    {
+        return self::is_debug_mode_active() &&
+               defined('\WP_DEBUG_LOG') &&
+               \WP_DEBUG_LOG;
+    }
+
     public static function encrypt(string $data): string
     {
         if (empty($data)) {
