@@ -1,3 +1,8 @@
+# Local documentation (AI agent context)
+AGENTS.md
+AI_AGENT_CACHE.md
+*.md.bak
+
 # Build scripts - local-only
 .build/
 

@@ -1,6 +1,6 @@
 # Cart Quote WooCommerce & Email
 
-[![Version](https://img.shields.io/badge/version-1.0.57-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
+[![Version](https://img.shields.io/badge/version-1.0.67-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
 [![WordPress](https://img.shields.io/badge/WordPress-%3E%3D5.8-blue.svg)](https://wordpress.org/)
 [![WooCommerce](https://img.shields.io/badge/WooCommerce-%3E%3D6.0-purple.svg)](https://woocommerce.com/)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-777bb4.svg)](https://php.net/)
@@ -353,6 +353,12 @@ cart-quote-woocommerce-email/
 ```
 
 ## Changelog
+
+### 1.0.67
+- Bug fix: Fixed "View Cart" and "Get Quote" buttons not working in mini-cart dropdown
+- Fixed: Click handler was attached to entire container, causing dropdown to close before link navigation
+- Fixed: Moved click handler to toggle button only, added stopPropagation on dropdown content
+- Updated: Added AGENTS.md and AI_AGENT_CACHE.md to .gitignore (local-only files)
 
 ### 1.0.58
 - Security: Removed URL parameter activation for mini-cart debug

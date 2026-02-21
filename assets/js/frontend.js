@@ -677,21 +677,22 @@ function isValidEmail(email) {
         });
     };
     
-    // Click toggle functionality
+    // Click toggle functionality - only toggle on the toggle button, not dropdown content
     var miniCartOpen = false;
     var miniCartTimer = null;
     
-    $('.cart-quote-mini-cart').on('click', function(e) {
+    // Toggle dropdown when clicking the toggle button only
+    $(document).on('click', '.cart-quote-mini-toggle', function(e) {
         e.preventDefault();
         e.stopPropagation();
         
-        var $this = $(this);
-        var $dropdown = $this.find('.cart-quote-mini-dropdown');
+        var $cart = $(this).closest('.cart-quote-mini-cart');
+        var $dropdown = $cart.find('.cart-quote-mini-dropdown');
         
         miniCartOpen = !miniCartOpen;
         
         if (miniCartOpen) {
-            $this.addClass('active');
+            $cart.addClass('active');
             $dropdown.addClass('active');
             
             clearTimeout(miniCartTimer);
@@ -703,6 +704,11 @@ function isValidEmail(email) {
         } else {
             closeMiniCart();
         }
+    });
+    
+    // Prevent clicks inside dropdown from closing it (allow links to work)
+    $(document).on('click', '.cart-quote-mini-dropdown', function(e) {
+        e.stopPropagation();
     });
     
     // Close when clicking outside
