@@ -1809,7 +1809,10 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
             [
                 'label' => __('Auto-Close Delay (seconds)', 'cart-quote-woocommerce-email'),
                 'type' => \Elementor\Controls_Manager::SLIDER,
-                'default' => '5',
+                'default' => [
+                    'size' => 5,
+                    'unit' => 's',
+                ],
                 'size_units' => ['s'],
                 'range' => [
                     's' => [
