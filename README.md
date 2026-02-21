@@ -45,6 +45,35 @@ Transform your WooCommerce checkout into a quote submission system with Google C
 3. Activate the plugin from the Plugins menu
 4. Configure settings at Cart Quotes > Settings
 
+## Build & Release
+
+The `.build/` directory contains local build scripts that are not tracked in git.
+
+### Build WordPress Plugin ZIP
+
+**Build ZIP**:
+```bash
+cd .build
+python build-zip.py <version>
+# Example: python build-zip.py 1.0.36
+```
+
+This creates a ZIP file in the parent directory with proper WordPress plugin structure.
+
+**Validate ZIP**:
+```bash
+python validate-zip.py ../cart-quote-woocommerce-email-v<version>.zip
+# Example: python validate-zip.py ../cart-quote-woocommerce-email-v1.0.36.zip
+```
+
+This validates that the ZIP file has:
+- Correct folder structure (cart-quote-woocommerce-email/)
+- No backslashes in file paths (Linux compatibility)
+- All required plugin files
+- Proper file types and counts
+
+**Note**: The `.build/` directory is excluded from git via `.gitignore`. Build scripts are maintained locally only.
+
 ## Configuration
 
 ### General Settings
