@@ -2013,21 +2013,6 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
                                             $parent_id = $parent['product_id'];
                                             $tier_items = isset($tier_items_by_parent[$parent_id]) ? $tier_items_by_parent[$parent_id] : [];
 
-                                            // Filter tier items by selected_tier
-                                            $selected_tier = null;
-                                            if (!empty($tier_items)) {
-                                                $selected_tier = isset($tier_items[0]['selected_tier'])
-                                                    ? (int) $tier_items[0]['selected_tier']
-                                                    : 1;
-                                            }
-
-                                            if ($selected_tier && !empty($tier_items)) {
-                                                $tier_items = array_filter($tier_items, function($item) use ($selected_tier) {
-                                                    return isset($item['tier_data']['tier_level'])
-                                                        && (int) $item['tier_data']['tier_level'] === $selected_tier;
-                                                });
-                                            }
-
                                             // Render parent item
                                             ?>
                                             <div class="cart-quote-mini-item parent-item">
