@@ -430,7 +430,7 @@
 }
 
 .cart-quote-mini-cart:hover .cart-quote-mini-dropdown {
-    display: none;
+    display: block;
 }
 
 /* Close Button - Minimalist */

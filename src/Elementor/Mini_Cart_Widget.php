@@ -1796,7 +1796,7 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
             [
                 'label' => __('Toggle Mode', 'cart-quote-woocommerce-email'),
                 'type' => \Elementor\Controls_Manager::SELECT,
-                'default' => 'click',
+                'default' => 'hover',
                 'options' => [
                     'click' => __('Click', 'cart-quote-woocommerce-email'),
                     'hover' => __('Hover', 'cart-quote-woocommerce-email'),
@@ -1822,7 +1822,7 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
                     ],
                 ],
                 'condition' => [
-                    'toggle_mode' => 'click',
+                    'toggle_mode' => 'hover',
                 ],
             ]
         );
