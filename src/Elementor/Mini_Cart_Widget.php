@@ -275,7 +275,7 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
                 'label' => __('Badge Background', 'cart-quote-woocommerce-email'),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .cart-count-badge' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .cart-quote-mini-count' => 'background-color: {{VALUE}};',
                 ],
             ]
         );
@@ -286,7 +286,7 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
                 'label' => __('Badge Text Color', 'cart-quote-woocommerce-email'),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .cart-count-badge' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .cart-quote-mini-count' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -309,7 +309,7 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
                     'unit' => 'px',
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .cart-count-badge' => 'font-size: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .cart-quote-mini-count' => 'font-size: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -337,7 +337,7 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
                     'unit' => '%',
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .cart-count-badge' => 'border-radius: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .cart-quote-mini-count' => 'border-radius: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -1911,13 +1911,13 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
             $cart_subtotal = '$347.00';
         }
         ?>
-        <div class="cart-quote-mini-cart-container" data-nonce="<?php echo esc_attr(wp_create_nonce('cart_quote_frontend_nonce')); ?>">
+        <div class="cart-quote-mini-cart-wrapper" data-nonce="<?php echo esc_attr(wp_create_nonce('cart_quote_frontend_nonce')); ?>">
             <div class="cart-quote-mini-cart">
                 <div class="cart-quote-mini-toggle">
                     <?php \Elementor\Icons_Manager::render_icon($settings['icon'], ['aria-hidden' => 'true']); ?>
                     
                     <?php if ($settings['show_count'] === 'yes') : ?>
-                        <span class="cart-count-badge <?php echo $is_empty && !$is_editor ? 'cart-empty' : ''; ?>">
+                        <span class="cart-quote-mini-count <?php echo $is_empty && !$is_editor ? 'cart-empty' : ''; ?>">
                             <?php echo esc_html($cart_count); ?>
                         </span>
                     <?php endif; ?>
