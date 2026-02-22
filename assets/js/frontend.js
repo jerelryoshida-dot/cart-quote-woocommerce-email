@@ -612,16 +612,25 @@ function isValidEmail(email) {
                                     var cartUrl = typeof wc_add_to_cart_params !== 'undefined' ? wc_add_to_cart_params.cart_url : '/cart/';
                                     var checkoutUrl = typeof wc_add_to_cart_params !== 'undefined' ? wc_add_to_cart_params.checkout_url : '/checkout/';
                                     
+                                    // Read show_quote_button setting from container data attribute
+                                    var showQuoteButton = $container.data('show-quote-button') || 'yes';
+                                    
+                                    var actionsHtml = '<div class="cart-quote-mini-actions">' +
+                                        '<a href="' + cartUrl + '" class="cart-quote-mini-btn view-cart">View Cart</a>';
+                                    
+                                    if (showQuoteButton === 'yes') {
+                                        actionsHtml += '<a href="' + checkoutUrl + '" class="cart-quote-mini-btn get-quote">Get Quote</a>';
+                                    }
+                                    
+                                    actionsHtml += '</div>';
+                                    
                                     $dropdown.html(
                                         '<div class="cart-quote-mini-items"></div>' +
                                         '<div class="cart-quote-mini-total">' +
                                             '<strong>Subtotal:</strong> ' +
                                             '<span class="subtotal-amount">' + response.data.formatted_subtotal + '</span>' +
                                         '</div>' +
-                                        '<div class="cart-quote-mini-actions">' +
-                                            '<a href="' + cartUrl + '" class="cart-quote-mini-btn view-cart">View Cart</a>' +
-                                            '<a href="' + checkoutUrl + '" class="cart-quote-mini-btn get-quote">Get Quote</a>' +
-                                        '</div>'
+                                        actionsHtml
                                     );
                                     $itemsList = $dropdown.find('.cart-quote-mini-items');
                                 }
@@ -777,16 +786,25 @@ function isValidEmail(email) {
                     var cartUrl = typeof wc_add_to_cart_params !== 'undefined' ? wc_add_to_cart_params.cart_url : '/cart/';
                     var checkoutUrl = typeof wc_add_to_cart_params !== 'undefined' ? wc_add_to_cart_params.checkout_url : '/checkout/';
                     
+                    // Read show_quote_button setting from container data attribute
+                    var showQuoteButton = $container.data('show-quote-button') || 'yes';
+                    
+                    var actionsHtml = '<div class="cart-quote-mini-actions">' +
+                        '<a href="' + cartUrl + '" class="cart-quote-mini-btn view-cart">View Cart</a>';
+                    
+                    if (showQuoteButton === 'yes') {
+                        actionsHtml += '<a href="' + checkoutUrl + '" class="cart-quote-mini-btn get-quote">Get Quote</a>';
+                    }
+                    
+                    actionsHtml += '</div>';
+                    
                     $dropdown.html(
                         '<div class="cart-quote-mini-items"></div>' +
                         '<div class="cart-quote-mini-total">' +
                             '<strong>Subtotal:</strong> ' +
                             '<span class="subtotal-amount">' + cartData.formatted_subtotal + '</span>' +
                         '</div>' +
-                        '<div class="cart-quote-mini-actions">' +
-                            '<a href="' + cartUrl + '" class="cart-quote-mini-btn view-cart">View Cart</a>' +
-                            '<a href="' + checkoutUrl + '" class="cart-quote-mini-btn get-quote">Get Quote</a>' +
-                        '</div>'
+                        actionsHtml
                     );
                     $itemsList = $dropdown.find('.cart-quote-mini-items');
                 }

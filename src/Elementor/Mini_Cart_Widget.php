@@ -1911,7 +1911,7 @@ class Mini_Cart_Widget extends \Elementor\Widget_Base
             $cart_subtotal = '$347.00';
         }
         ?>
-        <div class="cart-quote-mini-cart-wrapper" data-nonce="<?php echo esc_attr(wp_create_nonce('cart_quote_frontend_nonce')); ?>" data-show-tier-items="<?php echo esc_attr($settings['show_tier_items']); ?>">
+        <div class="cart-quote-mini-cart-wrapper" data-nonce="<?php echo esc_attr(wp_create_nonce('cart_quote_frontend_nonce')); ?>" data-show-tier-items="<?php echo esc_attr($settings['show_tier_items']); ?>" data-show-quote-button="<?php echo esc_attr(isset($settings['show_quote_button']) ? $settings['show_quote_button'] : 'yes'); ?>">
             <div class="cart-quote-mini-cart">
                 <div class="cart-quote-mini-toggle">
                     <?php \Elementor\Icons_Manager::render_icon($settings['icon'], ['aria-hidden' => 'true']); ?>
