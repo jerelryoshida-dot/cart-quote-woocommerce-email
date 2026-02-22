@@ -736,49 +736,92 @@ function isValidEmail(email) {
                 `;
                 $dropdown.html(emptyCartHTML);
             } else {
-                // Rebuild items list
+                // Rebuild items list with parent+tier grouping to match PHP template
                 var $itemsList = $dropdown.find('.cart-quote-mini-items');
                 if ($itemsList.length) {
                     $itemsList.empty();
                     
+                    // Get show_tier_items setting from container data attribute
+                    var showTierItems = $container.data('show-tier-items') || 'yes';
+                    
+                    // Group items by product_id (same logic as PHP template)
+                    var groupedItems = {};
                     cartData.items.forEach(function(item) {
-                        var $item = $('<li class="cart-quote-mini-item"></li>');
+                        var pid = item.product_id;
+                        if (!groupedItems[pid]) {
+                            groupedItems[pid] = {
+                                product_name: item.product_name,
+                                product_id: pid,
+                                total_quantity: 0,
+                                total_price: 0,
+                                tier_items: []
+                            };
+                        }
+                        groupedItems[pid].total_quantity += item.quantity;
+                        groupedItems[pid].total_price += item.line_total_raw || 0;
                         
-                        var tierBadgeHtml = '';
+                        // Add to tier_items if has tier_data
                         if (item.tier_data) {
-                            var tierLabel = '';
-                            if (item.tier_data.tier_level) {
-                                tierLabel = 'Tier ' + item.tier_data.tier_level;
-                                if (item.tier_data.description) {
-                                    tierLabel += ': ' + item.tier_data.description;
-                                } else if (item.tier_data.tier_name) {
-                                    tierLabel += ': ' + item.tier_data.tier_name;
+                            groupedItems[pid].tier_items.push(item);
+                        }
+                    });
+                    
+                    // Convert to array for iteration
+                    var groups = Object.values(groupedItems);
+                    var groupCount = groups.length;
+                    
+                    groups.forEach(function(group, index) {
+                        // Build tier label helper function
+                        function buildTierLabel(tierData) {
+                            if (!tierData) return '';
+                            var label = '';
+                            if (tierData.tier_level) {
+                                label = 'Tier ' + tierData.tier_level;
+                                if (tierData.description) {
+                                    label += ': ' + tierData.description;
+                                } else if (tierData.tier_name) {
+                                    label += ': ' + tierData.tier_name;
                                 }
-                            } else if (item.tier_data.description) {
-                                tierLabel = item.tier_data.description;
-                            } else if (item.tier_data.tier_name) {
-                                tierLabel = item.tier_data.tier_name;
+                            } else if (tierData.description) {
+                                label = tierData.description;
+                            } else if (tierData.tier_name) {
+                                label = tierData.tier_name;
                             }
-                            
-                            if (tierLabel) {
-                                tierBadgeHtml = '<div class="item-tier-badge">' +
-                                    '<span class="tier-desc">' +
-                                        tierLabel +
-                                        '<span class="tier-qty">x' + item.quantity + '</span>' +
-                                    '</span>' +
-                                    '<span class="tier-price">' + item.line_total + '</span>' +
-                                '</div>';
-                            }
+                            return label;
                         }
                         
-                        $item.html(
-                            '<div class="item-header">' +
-                                '<span class="item-name">' + item.product_name + '</span>' +
-                                '<span class="item-price">' + item.line_total + '</span>' +
-                            '</div>' +
-                            tierBadgeHtml
+                        // Format price helper function
+                        function formatPrice(amount) {
+                            return '$' + parseFloat(amount).toFixed(2);
+                        }
+                        
+                        // Parent item
+                        var $parentItem = $('<div class="cart-quote-mini-item parent-item"></div>');
+                        $parentItem.html(
+                            '<span class="item-name">' + group.product_name + '</span>' +
+                            '<span class="item-qty">X' + group.total_quantity + '</span>' +
+                            '<span class="item-price">' + formatPrice(group.total_price) + '</span>'
                         );
-                        $itemsList.append($item);
+                        $itemsList.append($parentItem);
+                        
+                        // Tier items (if enabled and has tier items)
+                        if (showTierItems === 'yes' && group.tier_items.length > 0) {
+                            group.tier_items.forEach(function(tierItem) {
+                                var tierLabel = buildTierLabel(tierItem.tier_data);
+                                var $tierItem = $('<div class="cart-quote-mini-item tier-item"></div>');
+                                $tierItem.html(
+                                    '<span class="item-name">• ' + tierLabel + '</span>' +
+                                    '<span class="item-qty">X' + tierItem.quantity + '</span>' +
+                                    '<span class="item-price">' + tierItem.line_total + '</span>'
+                                );
+                                $itemsList.append($tierItem);
+                            });
+                        }
+                        
+                        // Separator (not after last group)
+                        if (index < groupCount - 1) {
+                            $itemsList.append('<div class="cart-quote-item-separator"></div>');
+                        }
                     });
                 }
                 
