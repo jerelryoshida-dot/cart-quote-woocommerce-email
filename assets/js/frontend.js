@@ -613,7 +613,8 @@ function isValidEmail(email) {
                                     var checkoutUrl = typeof wc_add_to_cart_params !== 'undefined' ? wc_add_to_cart_params.checkout_url : '/checkout/';
                                     
                                     // Read show_quote_button setting from container data attribute
-                                    var showQuoteButton = $container.data('show-quote-button') || 'yes';
+                                    var showQuoteButton = $container.data('show-quote-button');
+                                    showQuoteButton = (showQuoteButton !== undefined && showQuoteButton !== null) ? showQuoteButton : 'yes';
                                     
                                     var actionsHtml = '<div class="cart-quote-mini-actions">' +
                                         '<a href="' + cartUrl + '" class="cart-quote-mini-btn view-cart">View Cart</a>';
@@ -787,7 +788,8 @@ function isValidEmail(email) {
                     var checkoutUrl = typeof wc_add_to_cart_params !== 'undefined' ? wc_add_to_cart_params.checkout_url : '/checkout/';
                     
                     // Read show_quote_button setting from container data attribute
-                    var showQuoteButton = $container.data('show-quote-button') || 'yes';
+                    var showQuoteButton = $container.data('show-quote-button');
+                    showQuoteButton = (showQuoteButton !== undefined && showQuoteButton !== null) ? showQuoteButton : 'yes';
                     
                     var actionsHtml = '<div class="cart-quote-mini-actions">' +
                         '<a href="' + cartUrl + '" class="cart-quote-mini-btn view-cart">View Cart</a>';
