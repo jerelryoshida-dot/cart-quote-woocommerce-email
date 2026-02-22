@@ -780,7 +780,7 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                                 $tier_items = isset($tier_items_by_parent[$parent_id]) ? $tier_items_by_parent[$parent_id] : [];
                             ?>
                                 <!-- Parent Item -->
-                                <li class="cart-quote-parent-item">
+                                <li class="cart-quote-parent-item" data-product-id="<?php echo esc_attr($parent_id); ?>">
                                     <span class="item-name"><?php echo esc_html($product->get_name()); ?></span>
                                     <span class="item-qty">X<?php echo esc_html($parent['quantity']); ?></span>
                                     <span class="item-price"><?php echo wc_price($parent['line_total']); ?></span>
@@ -805,7 +805,7 @@ class Quote_Form_Widget extends \Elementor\Widget_Base
                                             $tier_label = esc_html($tier_data['tier_name']);
                                         }
                                     ?>
-                                        <li class="cart-quote-tier-item" data-cart-item-key="<?php echo esc_attr($tier_item['key']); ?>">
+                                        <li class="cart-quote-tier-item" data-cart-item-key="<?php echo esc_attr($tier_item['key']); ?>" data-product-id="<?php echo esc_attr($parent_id); ?>">
                                             <span class="item-name">• <?php echo $tier_label; ?></span>
                                             <span class="item-quantity">
                                                 <button type="button" class="cart-quote-qty-btn cart-quote-qty-minus" data-cart-item-key="<?php echo esc_attr($tier_item['key']); ?>">-</button>

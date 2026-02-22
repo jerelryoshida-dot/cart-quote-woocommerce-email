@@ -57,9 +57,14 @@
                         $wrapper.find('.cart-quote-subtotal-amount').html(response.data.subtotal);
                     }
                     
-                    // Update global cart count if present
+                    // Update cart count badges (supports multiple selectors)
                     if (response.data.cart_count !== undefined) {
-                        $('.cart-quote-count').text(response.data.cart_count);
+                        $('.cart-quote-count, .cart-count-badge, .cart-quote-mini-count').text(response.data.cart_count);
+                    }
+                    
+                    // Refresh quote form cart summary to update parent aggregations
+                    if (typeof window.cartQuoteRefreshQuoteForm === 'function') {
+                        window.cartQuoteRefreshQuoteForm();
                     }
                 } else {
                     // Show error message if available
@@ -269,24 +274,34 @@ function isValidEmail(email) {
                 },
                 success: function(response) {
                     if (response.success) {
-                        $row.fadeOut(200, function() {
-                            $(this).remove();
+                        // Update cart count badges (supports multiple selectors)
+                        if (response.data.cart_count !== undefined) {
+                            $('.cart-quote-count, .cart-count-badge, .cart-quote-mini-count').text(response.data.cart_count);
+                        }
+                        
+                        // Reload if cart is empty
+                        if (response.data.cart_count === 0) {
+                            location.reload();
+                            return;
+                        }
+                        
+                        // Refresh quote form cart summary to update parent aggregations
+                        if (typeof window.cartQuoteRefreshQuoteForm === 'function') {
+                            window.cartQuoteRefreshQuoteForm();
+                        } else {
+                            // Fallback: just remove the row and update subtotal
+                            $row.fadeOut(200, function() {
+                                $(this).remove();
+                            });
                             
-                            // Update subtotal if in quote form
                             if ($wrapper.length && response.data.subtotal) {
                                 $wrapper.find('.cart-quote-subtotal-amount').html(response.data.subtotal);
                             }
                             
-                            // Update cart widget subtotal
                             if (response.data.subtotal) {
                                 $('.cart-quote-subtotal-value').html(response.data.subtotal);
                             }
-                            
-                            // Reload if cart is empty
-                            if (response.data.cart_count === 0) {
-                                location.reload();
-                            }
-                        });
+                        }
                     } else {
                         // Restore opacity on error
                         $row.css('opacity', '1');
@@ -871,6 +886,161 @@ function isValidEmail(email) {
         
         // Trigger custom event for other scripts
         $(document).trigger('cartQuoteMiniCartUpdated', [cartData]);
+    };
+    
+    /**
+     * Refresh Quote Form cart summary
+     * Rebuilds parent+tier grouping after cart changes
+     * 
+     * @param {Object} options - Optional configuration
+     * @param {Function} options.onSuccess - Callback after successful refresh
+     * @param {Function} options.onError - Callback on error
+     */
+    window.cartQuoteRefreshQuoteForm = function(options) {
+        options = options || {};
+        
+        var $wrapper = $('.cart-quote-form-wrapper');
+        if (!$wrapper.length) {
+            return;
+        }
+        
+        var $cartSummary = $wrapper.find('.cart-quote-cart-summary');
+        if (!$cartSummary.length) {
+            return;
+        }
+        
+        if (typeof cartQuoteFrontend === 'undefined') {
+            return;
+        }
+        
+        $.ajax({
+            url: cartQuoteFrontend.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'cart_quote_get_cart',
+                nonce: cartQuoteFrontend.nonce
+            },
+            success: function(response) {
+                if (response.success && response.data) {
+                    // Update subtotal
+                    $wrapper.find('.cart-quote-subtotal-amount').html(response.data.formatted_subtotal);
+                    
+                    // If cart is empty, reload page
+                    if (response.data.is_empty) {
+                        location.reload();
+                        return;
+                    }
+                    
+                    // Group items by product_id (same logic as PHP template)
+                    var groupedItems = {};
+                    response.data.items.forEach(function(item) {
+                        var pid = item.product_id;
+                        if (!groupedItems[pid]) {
+                            groupedItems[pid] = {
+                                product_name: item.product_name,
+                                product_id: pid,
+                                total_quantity: 0,
+                                total_price: 0,
+                                tier_items: []
+                            };
+                        }
+                        groupedItems[pid].total_quantity += item.quantity;
+                        groupedItems[pid].total_price += item.line_total_raw || 0;
+                        
+                        // Add to tier_items if has tier_data
+                        if (item.tier_data) {
+                            groupedItems[pid].tier_items.push(item);
+                        }
+                    });
+                    
+                    // Update each parent item and its tier items
+                    var groups = Object.values(groupedItems);
+                    
+                    // Remove all existing items
+                    $cartSummary.find('.cart-quote-summary-items').empty();
+                    
+                    var $itemsList = $cartSummary.find('.cart-quote-summary-items');
+                    var groupCount = groups.length;
+                    
+                    groups.forEach(function(group, index) {
+                        // Build tier label helper function
+                        function buildTierLabel(tierData) {
+                            if (!tierData) return '';
+                            var label = '';
+                            if (tierData.tier_level) {
+                                label = 'Tier ' + tierData.tier_level;
+                                if (tierData.description) {
+                                    label += ': ' + tierData.description;
+                                } else if (tierData.tier_name) {
+                                    label += ': ' + tierData.tier_name;
+                                }
+                            } else if (tierData.description) {
+                                label = tierData.description;
+                            } else if (tierData.tier_name) {
+                                label = tierData.tier_name;
+                            }
+                            return label;
+                        }
+                        
+                        // Format price helper function
+                        function formatPrice(amount) {
+                            return '$' + parseFloat(amount).toFixed(2);
+                        }
+                        
+                        // Parent item
+                        var $parentItem = $('<li class="cart-quote-parent-item" data-product-id="' + group.product_id + '"></li>');
+                        $parentItem.html(
+                            '<span class="item-name">' + group.product_name + '</span>' +
+                            '<span class="item-qty">X' + group.total_quantity + '</span>' +
+                            '<span class="item-price">' + formatPrice(group.total_price) + '</span>'
+                        );
+                        $itemsList.append($parentItem);
+                        
+                        // Tier items
+                        if (group.tier_items.length > 0) {
+                            group.tier_items.forEach(function(tierItem) {
+                                var tierLabel = buildTierLabel(tierItem.tier_data);
+                                var $tierItem = $('<li class="cart-quote-tier-item" data-cart-item-key="' + tierItem.key + '" data-product-id="' + group.product_id + '"></li>');
+                                $tierItem.html(
+                                    '<span class="item-name">• ' + tierLabel + '</span>' +
+                                    '<span class="item-quantity">' +
+                                        '<button type="button" class="cart-quote-qty-btn cart-quote-qty-minus" data-cart-item-key="' + tierItem.key + '">-</button>' +
+                                        '<input type="number" class="cart-quote-qty-input" value="' + tierItem.quantity + '" min="1" data-cart-item-key="' + tierItem.key + '">' +
+                                        '<button type="button" class="cart-quote-qty-btn cart-quote-qty-plus" data-cart-item-key="' + tierItem.key + '">+</button>' +
+                                    '</span>' +
+                                    '<span class="item-price">' + tierItem.line_total + '</span>' +
+                                    '<button type="button" class="cart-quote-remove-btn" data-cart-item-key="' + tierItem.key + '" data-product-name="' + tierLabel + '" title="Remove item">' +
+                                        '<span class="cart-quote-remove-icon">×</span>' +
+                                    '</button>'
+                                );
+                                $itemsList.append($tierItem);
+                            });
+                        }
+                        
+                        // Separator (not after last group)
+                        if (index < groupCount - 1) {
+                            $itemsList.append('<li class="cart-quote-item-separator"></li>');
+                        }
+                    });
+                    
+                    // Trigger custom event
+                    $(document).trigger('cartQuoteQuoteFormRefreshed', [response.data]);
+                    
+                    // Call success callback if provided
+                    if (typeof options.onSuccess === 'function') {
+                        options.onSuccess(response.data);
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Cart Quote Quote Form Refresh Failed:', error);
+                
+                // Call error callback if provided
+                if (typeof options.onError === 'function') {
+                    options.onError({xhr: xhr, status: status, error: error});
+                }
+            }
+        });
     };
     
     // Click toggle functionality - only toggle on the toggle button, not dropdown content
