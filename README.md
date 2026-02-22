@@ -1,6 +1,6 @@
 # Cart Quote WooCommerce & Email
 
-[![Version](https://img.shields.io/badge/version-1.0.71-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
+[![Version](https://img.shields.io/badge/version-1.0.72-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
 [![WordPress](https://img.shields.io/badge/WordPress-%3E%3D5.8-blue.svg)](https://wordpress.org/)
 [![WooCommerce](https://img.shields.io/badge/WooCommerce-%3E%3D6.0-purple.svg)](https://woocommerce.com/)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-777bb4.svg)](https://php.net/)
@@ -353,6 +353,12 @@ cart-quote-woocommerce-email/
 ```
 
 ## Changelog
+
+### 1.0.72
+- Bug fix: Mini-cart not refreshing after add-to-cart (complete fix)
+- Fixed: `cartQuoteUpdateMiniCart()` function was missing dual selector support
+- Updated: Both container and count badge selectors now support Elementor widget classes
+- Note: This completes the partial fix from v1.0.70
 
 ### 1.0.71
 - Revert: Restored original Elementor mini-cart styling
