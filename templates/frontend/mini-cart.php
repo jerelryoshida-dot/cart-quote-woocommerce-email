@@ -247,7 +247,7 @@ if ($debug_log) {
             
             <span class="cart-quote-label">
                 <?php esc_html_e('Cart', 'cart-quote-woocommerce-email'); ?>
-                <span class="cart-count-badge">(<?php echo esc_html($cart_count); ?>)</span>
+                <span class="cart-count-badge"><?php echo esc_html($cart_count); ?></span>
             </span>
             
             <?php if ($atts['show_subtotal'] === 'true') : ?>

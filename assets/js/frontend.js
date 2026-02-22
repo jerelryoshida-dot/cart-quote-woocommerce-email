@@ -595,7 +595,7 @@ function isValidEmail(email) {
                                     $itemsList.empty();
                                     
                                      response.data.items.forEach(function(item) {
-                                        var $item = $('<li class="cart-quote-mini-item"></li>');
+                        var $item = $('<div class="cart-quote-mini-item"></div>');
                                         
                                         var tierBadgeHtml = '';
                                         if (item.tier_data) {
@@ -703,7 +703,7 @@ function isValidEmail(email) {
             // Update count badge (supports both shortcode and Elementor class names)
             var $count = $toggle.find('.cart-count-badge, .cart-quote-mini-count');
             if ($count.length) {
-                $count.text('(' + cartData.count + ')');
+                $count.text(cartData.count);
                 if (cartData.count > 0) {
                     $count.removeClass('cart-empty');
                 } else {
