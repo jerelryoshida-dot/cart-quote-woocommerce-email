@@ -931,8 +931,10 @@ function isValidEmail(email) {
                         return;
                     }
                     
-                    // Group items by product_id (same logic as PHP template)
+                    // Group items by product_id, preserving order of first appearance
                     var groupedItems = {};
+                    var productOrder = [];  // Track order of product IDs
+                    
                     response.data.items.forEach(function(item) {
                         var pid = item.product_id;
                         if (!groupedItems[pid]) {
@@ -943,6 +945,7 @@ function isValidEmail(email) {
                                 total_price: 0,
                                 tier_items: []
                             };
+                            productOrder.push(pid);  // Remember order of first appearance
                         }
                         groupedItems[pid].total_quantity += item.quantity;
                         groupedItems[pid].total_price += item.line_total_raw || 0;
@@ -953,8 +956,10 @@ function isValidEmail(email) {
                         }
                     });
                     
-                    // Update each parent item and its tier items
-                    var groups = Object.values(groupedItems);
+                    // Build groups in the order products first appeared
+                    var groups = productOrder.map(function(pid) {
+                        return groupedItems[pid];
+                    });
                     
                     // Remove all existing items
                     $cartSummary.find('.cart-quote-summary-items').empty();
