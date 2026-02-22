@@ -545,15 +545,15 @@ function isValidEmail(email) {
             },
             success: function(response) {
                 if (response.success && response.data) {
-                    // Update all mini-cart instances on page
-                    $('.cart-quote-mini-cart-container').each(function() {
+        // Update all mini-cart instances on page (supports both shortcode and Elementor)
+        $('.cart-quote-mini-cart-container, .cart-quote-mini-cart-wrapper').each(function() {
                         var $container = $(this);
                         var $cart = $container.find('.cart-quote-mini-cart');
                         var $toggle = $cart.find('.cart-quote-mini-toggle');
                         var $dropdown = $cart.find('.cart-quote-mini-dropdown');
                         
-                        // Update count badge
-                        var $count = $toggle.find('.cart-count-badge');
+            // Update count badge (supports both shortcode and Elementor class names)
+            var $count = $toggle.find('.cart-count-badge, .cart-quote-mini-count');
                         if ($count.length) {
                             $count.text('(' + response.data.count + ')');
                             if (response.data.count > 0) {

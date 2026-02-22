@@ -1,6 +1,6 @@
 # Cart Quote WooCommerce & Email
 
-[![Version](https://img.shields.io/badge/version-1.0.68-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
+[![Version](https://img.shields.io/badge/version-1.0.70-blue.svg)](https://github.com/jerelryoshida-dot/cart-quote-woocommerce-email)
 [![WordPress](https://img.shields.io/badge/WordPress-%3E%3D5.8-blue.svg)](https://wordpress.org/)
 [![WooCommerce](https://img.shields.io/badge/WooCommerce-%3E%3D6.0-purple.svg)](https://woocommerce.com/)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-777bb4.svg)](https://php.net/)
@@ -353,6 +353,13 @@ cart-quote-woocommerce-email/
 ```
 
 ## Changelog
+
+### 1.0.70
+- Bug fix: Mini-cart not refreshing after add-to-cart from marketplace
+- Fixed: CSS selector mismatch between JavaScript (`cartQuoteUpdateMiniCart`) and Elementor widget HTML
+- Fixed: JavaScript now supports both `.cart-quote-mini-cart-container` and `.cart-quote-mini-cart-wrapper` selectors
+- Fixed: JavaScript now supports both `.cart-count-badge` and `.cart-quote-mini-count` selectors
+- Updated: Standardized Elementor widget HTML classes to match shortcode template
 
 ### 1.0.68
 - UX Enhancement: Quote Form cart summary now matches mini-cart layout
