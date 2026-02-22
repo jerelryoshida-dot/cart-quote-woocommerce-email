@@ -591,8 +591,27 @@ function isValidEmail(email) {
                             } else {
                                 // Rebuild items list
                                 var $itemsList = $dropdown.find('.cart-quote-mini-items');
-                                if ($itemsList.length) {
-                                    $itemsList.empty();
+                                
+                                // If transitioning from empty to non-empty, rebuild dropdown structure
+                                if (!$itemsList.length) {
+                                    var cartUrl = typeof wc_add_to_cart_params !== 'undefined' ? wc_add_to_cart_params.cart_url : '/cart/';
+                                    var checkoutUrl = typeof wc_add_to_cart_params !== 'undefined' ? wc_add_to_cart_params.checkout_url : '/checkout/';
+                                    
+                                    $dropdown.html(
+                                        '<div class="cart-quote-mini-items"></div>' +
+                                        '<div class="cart-quote-mini-total">' +
+                                            '<strong>Subtotal:</strong> ' +
+                                            '<span class="subtotal-amount">' + response.data.formatted_subtotal + '</span>' +
+                                        '</div>' +
+                                        '<div class="cart-quote-mini-actions">' +
+                                            '<a href="' + cartUrl + '" class="cart-quote-mini-btn view-cart">View Cart</a>' +
+                                            '<a href="' + checkoutUrl + '" class="cart-quote-mini-btn get-quote">Get Quote</a>' +
+                                        '</div>'
+                                    );
+                                    $itemsList = $dropdown.find('.cart-quote-mini-items');
+                                }
+                                
+                                $itemsList.empty();
                                     
                                      response.data.items.forEach(function(item) {
                         var $item = $('<div class="cart-quote-mini-item"></div>');
@@ -633,13 +652,12 @@ function isValidEmail(email) {
                                         );
                                         $itemsList.append($item);
                                     });
-                                }
-                                
-                                // Update subtotal in dropdown
-                                var $amount = $dropdown.find('.cart-quote-mini-total .subtotal-amount');
-                                if ($amount.length) {
-                                    $amount.html(response.data.formatted_subtotal);
-                                }
+                                    
+                                    // Update subtotal in dropdown
+                                    var $amount = $dropdown.find('.cart-quote-mini-total .subtotal-amount');
+                                    if ($amount.length) {
+                                        $amount.html(response.data.formatted_subtotal);
+                                    }
                             }
                         }
                     });
@@ -738,11 +756,30 @@ function isValidEmail(email) {
             } else {
                 // Rebuild items list with parent+tier grouping to match PHP template
                 var $itemsList = $dropdown.find('.cart-quote-mini-items');
-                if ($itemsList.length) {
-                    $itemsList.empty();
+                
+                // If transitioning from empty to non-empty, rebuild dropdown structure
+                if (!$itemsList.length) {
+                    var cartUrl = typeof wc_add_to_cart_params !== 'undefined' ? wc_add_to_cart_params.cart_url : '/cart/';
+                    var checkoutUrl = typeof wc_add_to_cart_params !== 'undefined' ? wc_add_to_cart_params.checkout_url : '/checkout/';
                     
-                    // Get show_tier_items setting from container data attribute
-                    var showTierItems = $container.data('show-tier-items') || 'yes';
+                    $dropdown.html(
+                        '<div class="cart-quote-mini-items"></div>' +
+                        '<div class="cart-quote-mini-total">' +
+                            '<strong>Subtotal:</strong> ' +
+                            '<span class="subtotal-amount">' + cartData.formatted_subtotal + '</span>' +
+                        '</div>' +
+                        '<div class="cart-quote-mini-actions">' +
+                            '<a href="' + cartUrl + '" class="cart-quote-mini-btn view-cart">View Cart</a>' +
+                            '<a href="' + checkoutUrl + '" class="cart-quote-mini-btn get-quote">Get Quote</a>' +
+                        '</div>'
+                    );
+                    $itemsList = $dropdown.find('.cart-quote-mini-items');
+                }
+                
+                $itemsList.empty();
+                
+                // Get show_tier_items setting from container data attribute
+                var showTierItems = $container.data('show-tier-items') || 'yes';
                     
                     // Group items by product_id (same logic as PHP template)
                     var groupedItems = {};
@@ -823,13 +860,12 @@ function isValidEmail(email) {
                             $itemsList.append('<div class="cart-quote-item-separator"></div>');
                         }
                     });
-                }
-                
-                // Update subtotal in dropdown
-                var $amount = $dropdown.find('.cart-quote-mini-total .subtotal-amount');
-                if ($amount.length) {
-                    $amount.html(cartData.formatted_subtotal);
-                }
+                    
+                    // Update subtotal in dropdown
+                    var $amount = $dropdown.find('.cart-quote-mini-total .subtotal-amount');
+                    if ($amount.length) {
+                        $amount.html(cartData.formatted_subtotal);
+                    }
             }
         });
         
